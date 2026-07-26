@@ -1,17 +1,19 @@
 package com.mth.academicfeesystem.modules.assignment.entity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
+import com.mth.academicfeesystem.common.entity.BaseEntity;
+import com.mth.academicfeesystem.common.enums.AssignmentStatus;
 import com.mth.academicfeesystem.modules.academic.entity.SchoolClass;
 import com.mth.academicfeesystem.modules.people.entity.Teacher;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,18 +28,17 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name="homeroom_assignments")
-public class HomeroomAssignment {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
-    private String status;
-    @ManyToOne
-    @JoinColumn(name="class_id")
+public class HomeroomAssignment extends BaseEntity{
+    @Column(nullable = false)
+    private LocalDate startDate;
+    private LocalDate endDate;
+    @Enumerated(EnumType.STRING)
+    private AssignmentStatus status;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="class_id",nullable = false)
     private SchoolClass schoolClass;
-    @ManyToOne
-    @JoinColumn(name="teacher_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="teacher_id",nullable = false)
     private Teacher teacher;
 
 }

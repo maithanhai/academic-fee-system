@@ -1,12 +1,12 @@
 package com.mth.academicfeesystem.modules.academic.entity;
 
+import com.mth.academicfeesystem.common.entity.BaseEntity;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,13 +21,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name="classes")
-public class SchoolClass {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class SchoolClass extends BaseEntity{
+    @Column(length = 20,nullable = false)
     private String name;
-    private int gradeLevel;
-    @ManyToOne
-    @JoinColumn(name="academic_year_id")
+    @Column(nullable = false)
+    private Integer gradeLevel;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="academic_year_id",nullable = false)
     private AcademicYear academicYear;
 }

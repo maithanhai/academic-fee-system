@@ -1,9 +1,9 @@
 package com.mth.academicfeesystem.modules.academic.entity;
 
+import com.mth.academicfeesystem.common.entity.BaseEntity;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,10 +18,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name="cohorts")
-public class Cohort {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Cohort extends BaseEntity{
+    @Column(length = 50,nullable = false)
     private String name;
-    private int admissionYear;
+    @Column(nullable = false,unique = true)
+    private Integer admissionYear;
 }

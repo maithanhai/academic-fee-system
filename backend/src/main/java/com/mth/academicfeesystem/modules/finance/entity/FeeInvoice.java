@@ -1,21 +1,22 @@
 package com.mth.academicfeesystem.modules.finance.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-
+import com.mth.academicfeesystem.common.entity.AuditableEntity;
+import com.mth.academicfeesystem.common.enums.InvoiceStatus;
+import com.mth.academicfeesystem.common.enums.PaymentMethod;
 import com.mth.academicfeesystem.modules.people.entity.Student;
 import com.mth.academicfeesystem.modules.user.entity.User;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,26 +30,26 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name="fee_invoices")
-public class FeeInvoice {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @ManyToOne
-    @JoinColumn(name="student_id")
+public class FeeInvoice extends AuditableEntity{
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="student_id",nullable = false)
     private Student student;
-    @ManyToOne
-    @JoinColumn(name="fee_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="fee_id",nullable = false)
     private Fee fee;
+    @Column(precision = 12,scale = 0,nullable = false)
     private BigDecimal amount;
-    private String status;
-    private String paymentMethod;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20,nullable = false)
+    private InvoiceStatus status;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private PaymentMethod paymentMethod;
+    @Column(nullable = true)
     private String undoReason;
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-    @CreatedDate
-    private LocalDateTime createdDate;
-    @LastModifiedDate
-    private LocalDateTime updatedDate;
-    private int version;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "action_by")
+    private User actionBy;
+    @Version
+    private Integer version;
 }
