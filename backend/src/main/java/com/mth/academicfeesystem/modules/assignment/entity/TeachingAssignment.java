@@ -1,13 +1,12 @@
 package com.mth.academicfeesystem.modules.assignment.entity;
 
+import com.mth.academicfeesystem.common.entity.BaseEntity;
 import com.mth.academicfeesystem.modules.academic.entity.SchoolClass;
 import com.mth.academicfeesystem.modules.academic.entity.Subject;
 import com.mth.academicfeesystem.modules.people.entity.Teacher;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -32,17 +31,14 @@ import lombok.Setter;
         )
     }
 )
-public class TeachingAssignment {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @ManyToOne
-    @JoinColumn(name="teacher_id")
+public class TeachingAssignment extends BaseEntity{
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="teacher_id",nullable = false)
     private Teacher teacher;
-    @ManyToOne
-    @JoinColumn(name="class_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="class_id",nullable = false)
     private SchoolClass schoolClass;
-    @ManyToOne
-    @JoinColumn(name="subject_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="subject_id",nullable = false)
     private Subject subject;
 }

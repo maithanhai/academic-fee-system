@@ -2,14 +2,13 @@ package com.mth.academicfeesystem.modules.audit.entity;
 
 import java.time.LocalDateTime;
 
-import org.springframework.data.annotation.CreatedDate;
+import org.hibernate.annotations.CreationTimestamp;
 
+import com.mth.academicfeesystem.common.entity.BaseEntity;
 import com.mth.academicfeesystem.modules.user.entity.User;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -26,17 +25,14 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name="audit_logs")
-public class AuditLog {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @ManyToOne
+public class AuditLog extends BaseEntity{
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     private User user;
     private String action;
     private String targetTable;
     private String payload;
     private String ipAddress;
-    @CreatedDate
+    @CreationTimestamp
     private LocalDateTime createdDate;
 }

@@ -1,11 +1,14 @@
 package com.mth.academicfeesystem.modules.grade.entity;
 
+import com.mth.academicfeesystem.common.entity.BaseEntity;
+import com.mth.academicfeesystem.common.enums.ExamType;
 import com.mth.academicfeesystem.modules.academic.entity.Subject;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -22,14 +25,15 @@ import lombok.Setter;
 @Builder
 @Entity
 @Table(name="grade_configs")
-public class GradeConfig {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @ManyToOne
-    @JoinColumn(name="subject_id")
+public class GradeConfig extends BaseEntity{
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="subject_id",nullable = false)
     private Subject subject;
-    private String examType;
-    private int coefficient;
-    private int maxColumn;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20,nullable = false)
+    private ExamType examType;
+    @Column(nullable = false)
+    private Integer coefficient;
+    @Column(nullable = false)
+    private Integer maxColumn;
 }

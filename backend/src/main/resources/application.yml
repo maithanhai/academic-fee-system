@@ -1,0 +1,83 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: academic-fee-system
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/academic_fee_system?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Ho_Chi_Minh&createDatabaseIfNotExist=true
+    username: root
+    password: ${DB_PASSWORD:123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update        # đang giai đoạn code entity -> để Hibernate tự tạo/cập nhật bảng
+                               # ⚠️ trước khi hoàn thiện đồ án: đổi sang 'validate' + chuyển hẳn sang Flyway
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 20
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  task:
+    execution:
+      pool:
+        core-size: 5
+        max-size: 10
+        queue-capacity: 100
+
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+# ---- Custom config, bind qua @ConfigurationProperties ----
+# JwtProperties.java đặt tại security/jwt/
+jwt:
+  secret: ${JWT_SECRET:academic-fee-system-secret-key-change-in-production-min-256-bit}
+  expiration: 86400000            # 24h (ms)
+  refresh-expiration: 604800000   # 7 ngày (ms)
+
+# VNPayProperties.java đặt tại modules/finance/vnpay/
+vnpay:
+  tmn-code: ${VNPAY_TMN_CODE:}
+  hash-secret: ${VNPAY_HASH_SECRET:}
+  pay-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+  return-url: http://localhost:8080/api/payments/vnpay-return
+  ipn-url: http://localhost:8080/api/payments/vnpay-ipn
+  version: "2.1.0"
+  command: pay
+  currency-code: VND
+  locale: vn
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+
+app:
+  cors:
+    allowed-origins: http://localhost:3000
+
+logging:
+  level:
+    root: INFO
+    com.mth.academicfeesystem: DEBUG
+    org.hibernate.SQL: DEBUG
