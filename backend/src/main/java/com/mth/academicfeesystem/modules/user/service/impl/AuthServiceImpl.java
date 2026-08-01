@@ -147,11 +147,11 @@ public class AuthServiceImpl implements AuthService{
         String newAccessToken = jwtTokenProvider.generateAccessToken(user.getId(), user.getUsername(), user.getRole().name());
         String newRefreshToken = jwtTokenProvider.generateRefreshToken(user.getId(), user.getUsername());
         return LoginResponse.builder()
-            .accessToken(newAccessToken)
-            .refreshToken(newRefreshToken)
-            .userId(user.getId())
-            .username(user.getUsername())
-            .role(user.getRole().name())
-            .build();
-    }
-}
+          .accessToken(newAccessToken)
+          .refreshToken(newRefreshToken)
+          .userId(user.getId())
+          .username(user.getUsername())
+          .role(user.getRole().name())
+          .build();
+ }
+

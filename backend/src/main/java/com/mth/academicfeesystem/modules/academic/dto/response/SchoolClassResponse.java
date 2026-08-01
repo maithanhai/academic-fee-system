@@ -1,5 +1,8 @@
 package com.mth.academicfeesystem.modules.academic.dto.response;
 
-public class SchoolClassResponse {
-
-}
+public record SchoolClassResponse(
+    Long id,
+    String name,
+    Integer gradeLevel,
+    AcademicYearResponse academicYear
+) {}

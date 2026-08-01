@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mth.academicfeesystem.common.response.ApiResponse;
@@ -19,15 +20,16 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class AuthController {
     private final AuthService authService;
-    @PostMapping("/api/auth/login")
+    @PostMapping("/auth/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid@RequestBody LoginRequest request){
         LoginResponse response=authService.login(request);
         return ResponseEntity.ok(new ApiResponse<>("Login successful",response));
     }
 
-    @PostMapping("/api/admin/students")
+    @PostMapping("/admin/students")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ApiResponse<?>> registerStudent(
         @Valid @RequestBody RegisterStudentRequest request
@@ -36,7 +38,7 @@ public class AuthController {
         return ResponseEntity.ok(new ApiResponse<>("Create account student successful"));
     }
 
-    @PostMapping("/api/admin/teachers")
+    @PostMapping("/admin/teachers")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ApiResponse<?>> registerTeacher(
         @Valid @RequestBody RegisterTeacherRequest request

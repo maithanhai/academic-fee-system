@@ -23,5 +23,5 @@ public class Subject extends AuditableEntity{
     private String name;
     @Builder.Default
     @Column(nullable = false)
-    private Boolean isActive=true;
+    private Boolean active=true;
 }

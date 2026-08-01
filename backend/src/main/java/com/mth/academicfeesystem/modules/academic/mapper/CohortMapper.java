@@ -1,12 +1,15 @@
 package com.mth.academicfeesystem.modules.academic.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import java.util.List;
 
+import org.mapstruct.Mapper;
+
+import com.mth.academicfeesystem.modules.academic.dto.request.CohortRequest;
 import com.mth.academicfeesystem.modules.academic.dto.response.CohortResponse;
 import com.mth.academicfeesystem.modules.academic.entity.Cohort;
 @Mapper(componentModel = "spring")
 public interface CohortMapper {
-    @Mapping(target = "cohort",source = "name")
     CohortResponse toResponse(Cohort cohort);
+    List<CohortResponse> toResponseList(List<Cohort> cohorts);
+    Cohort toEntity(CohortRequest request);
 }
