@@ -2,12 +2,6 @@
 
 ## Dữ liệu cốt lõi và phân quyền
 
-### 1. role
-```sql
-- id (PK)
-- name ('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')
-```
-
 ### 2. user - người dùng
 ```sql
 - id (PK)
@@ -17,7 +11,7 @@
 - phone
 - email
 - gender
-- role_id (FK -> role.id)
+- role (enum)
 - created_date (DATE)
 - updated_date (DATE)
 - is_active (BOOLEAN)

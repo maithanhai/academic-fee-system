@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.data.annotation.CreatedDate;
 
 import com.mth.academicfeesystem.common.entity.BaseEntity;
 import com.mth.academicfeesystem.modules.academic.entity.AcademicYear;

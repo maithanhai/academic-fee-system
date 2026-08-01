@@ -1,5 +1,8 @@
 package com.mth.academicfeesystem.modules.people.dto.response;
 
-public class TeacherResponse {
-
-}
+public record TeacherResponse (
+    String username,
+    String fullName,
+    DepartmentResponse department,
+    Boolean active
+){}
