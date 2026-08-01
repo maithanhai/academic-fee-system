@@ -1,5 +1,10 @@
 package com.mth.academicfeesystem.modules.academic.dto.request;
 
-public class CohortRequest {
+import jakarta.validation.constraints.NotBlank;
+
+public record CohortRequest (
+    @NotBlank(message = "Cohort name is required")
+    String name
+){
 
 }

@@ -1,5 +1,9 @@
 package com.mth.academicfeesystem.modules.academic.dto.response;
 
-public class SubjectResponse {
-
+public record SubjectResponse (
+    Long id,
+    String name,
+    Boolean active
+){
+    
 }

@@ -1,5 +1,9 @@
 package com.mth.academicfeesystem.modules.academic.repository;
 
-public class SemesterRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.mth.academicfeesystem.modules.academic.entity.Semester;
+
+public interface SemesterRepository extends JpaRepository<Semester, Long> {
 
 }

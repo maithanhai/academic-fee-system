@@ -10,12 +10,10 @@ import org.springframework.stereotype.Service;
 
 import com.mth.academicfeesystem.common.exception.ResourceNotFoundException;
 import com.mth.academicfeesystem.common.response.PageResponse;
-import com.mth.academicfeesystem.modules.academic.entity.Cohort;
 import com.mth.academicfeesystem.modules.people.dto.request.TeacherSearchRequest;
 import com.mth.academicfeesystem.modules.people.dto.response.TeacherDetailResponse;
 import com.mth.academicfeesystem.modules.people.dto.response.TeacherResponse;
 import com.mth.academicfeesystem.modules.people.entity.Department;
-import com.mth.academicfeesystem.modules.people.entity.Student;
 import com.mth.academicfeesystem.modules.people.entity.Teacher;
 import com.mth.academicfeesystem.modules.people.mapper.TeacherMapper;
 import com.mth.academicfeesystem.modules.people.repository.TeacherRepository;

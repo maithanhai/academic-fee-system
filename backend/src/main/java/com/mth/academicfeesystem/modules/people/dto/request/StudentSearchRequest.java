@@ -15,4 +15,5 @@ public class StudentSearchRequest{
     private String fullName;
     private String cohort;
     private Boolean active;
+    private Long classId;
 }

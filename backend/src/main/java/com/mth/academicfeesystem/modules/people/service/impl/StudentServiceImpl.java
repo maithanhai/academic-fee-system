@@ -8,8 +8,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.mth.academicfeesystem.common.enums.EnrollmentStatus;
 import com.mth.academicfeesystem.common.exception.ResourceNotFoundException;
 import com.mth.academicfeesystem.common.response.PageResponse;
+import com.mth.academicfeesystem.modules.academic.entity.ClassEnrollment;
 import com.mth.academicfeesystem.modules.academic.entity.Cohort;
 import com.mth.academicfeesystem.modules.people.dto.request.StudentSearchRequest;
 import com.mth.academicfeesystem.modules.people.dto.response.StudentDetailResponse;
@@ -50,6 +52,13 @@ public class StudentServiceImpl implements StudentService{
             if (request.getActive() != null) {
             predicates.add(cb.equal(userJoin.get("active"), request.getActive()));
             }
+
+            if (request.getClassId() != null) {
+            Join<Student, ClassEnrollment> enrollmentJoin = root.join("enrollments");
+            
+            predicates.add(cb.equal(enrollmentJoin.get("schoolClass").get("id"), request.getClassId()));
+            predicates.add(cb.equal(enrollmentJoin.get("status"), EnrollmentStatus.ACTIVE));
+        }
             
             return cb.and(predicates.toArray(new Predicate[0]));
         };

@@ -1,5 +1,6 @@
 package com.mth.academicfeesystem.modules.academic.dto.request;
 
-public class AcademicYearRequest {
-
+public record AcademicYearRequest (
+    String name
+){
 }

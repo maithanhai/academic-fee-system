@@ -1,5 +1,13 @@
 package com.mth.academicfeesystem.modules.academic.service;
 
-public class SchoolClassService {
+import org.springframework.data.domain.Pageable;
 
+import com.mth.academicfeesystem.common.response.PageResponse;
+import com.mth.academicfeesystem.modules.academic.dto.request.SchoolClassRequest;
+import com.mth.academicfeesystem.modules.academic.dto.request.SchoolClassSearchRequest;
+import com.mth.academicfeesystem.modules.academic.dto.response.SchoolClassResponse;
+
+public interface SchoolClassService {
+    PageResponse<SchoolClassResponse> searchClasses(SchoolClassSearchRequest request, Pageable pageable);
+    SchoolClassResponse createClass(SchoolClassRequest request);
 }

@@ -1,5 +1,6 @@
 package com.mth.academicfeesystem.modules.academic.dto.response;
 
 public record CohortResponse(
-    String cohort
+    Long id,
+    String name
 ) {} 

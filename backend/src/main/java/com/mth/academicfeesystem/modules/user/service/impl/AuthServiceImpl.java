@@ -29,6 +29,7 @@ import com.mth.academicfeesystem.modules.people.repository.DepartmentRepository;
 import com.mth.academicfeesystem.modules.people.repository.StudentRepository;
 import com.mth.academicfeesystem.modules.people.repository.TeacherRepository;
 import com.mth.academicfeesystem.modules.user.dto.request.LoginRequest;
+import com.mth.academicfeesystem.modules.user.dto.request.RefreshTokenRequest;
 import com.mth.academicfeesystem.modules.user.dto.request.RegisterStudentRequest;
 import com.mth.academicfeesystem.modules.user.dto.request.RegisterTeacherRequest;
 import com.mth.academicfeesystem.modules.user.dto.response.LoginResponse;
@@ -132,4 +133,25 @@ public class AuthServiceImpl implements AuthService{
         teacher.setUser(user); 
         teacherRepo.save(teacher);
     }
+
+    @Transactional
+    @Override
+    public LoginResponse refreshToken(RefreshTokenRequest request){
+        String refreshToken = request.refreshToken();
+        String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
+        User user = userRepo.findByUsername(username)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
+            throw new BusinessException("Invalid refresh token");
+    }
+    String newAccessToken = jwtTokenProvider.generateAccessToken(user.getId(), user.getUsername(), user.getRole().name());
+    String newRefreshToken = jwtTokenProvider.generateRefreshToken(user.getId(), user.getUsername());
+    return LoginResponse.builder()
+        .accessToken(newAccessToken)
+        .refreshToken(newRefreshToken)
+        .userId(user.getId())
+        .username(user.getUsername())
+        .role(user.getRole().name())
+        .build();
+ }
 }
