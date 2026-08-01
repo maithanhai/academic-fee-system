@@ -1,5 +1,9 @@
 package com.mth.academicfeesystem.modules.academic.repository;
 
-public class ClassEnrollmentRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.mth.academicfeesystem.modules.academic.entity.ClassEnrollment;
+
+public interface ClassEnrollmentRepository extends JpaRepository<ClassEnrollment,Long>{
 
 }

@@ -13,12 +13,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor //constructor full tham so
 @JsonInclude(JsonInclude.Include.NON_NULL)  // loai bo null
 public class ApiResponse<T> {
-    private int status;
     private String message;
     private T data;
 
-    public ApiResponse(int status, String message) {
-        this.status = status;
+    public ApiResponse(String message) {
         this.message = message;
     }
 }

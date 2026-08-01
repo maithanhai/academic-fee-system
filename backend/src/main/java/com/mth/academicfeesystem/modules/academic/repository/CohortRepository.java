@@ -1,5 +1,10 @@
 package com.mth.academicfeesystem.modules.academic.repository;
 
-public class CohortRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
 
-}
+import com.mth.academicfeesystem.modules.academic.entity.Cohort;
+
+public interface CohortRepository extends JpaRepository<Cohort,Long>{
+
+    
+} 

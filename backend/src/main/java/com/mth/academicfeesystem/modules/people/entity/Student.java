@@ -1,8 +1,9 @@
 package com.mth.academicfeesystem.modules.people.entity;
 
-import java.time.LocalDate;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mth.academicfeesystem.modules.academic.entity.ClassEnrollment;
 import com.mth.academicfeesystem.modules.academic.entity.Cohort;
 import com.mth.academicfeesystem.modules.user.entity.User;
 
@@ -13,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -32,8 +34,6 @@ public class Student{
     @Id
     private Long id;
     @Column(nullable = true)
-    private LocalDate dateOfBirth;
-    @Column(nullable = true)
     private String address;
     @Column(length = 15)
     private String phoneParent;
@@ -46,4 +46,6 @@ public class Student{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="cohort_id",nullable = false)
     private Cohort cohort;
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "student")
+    private List<ClassEnrollment> enrollments;
 }

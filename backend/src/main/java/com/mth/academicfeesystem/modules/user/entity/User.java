@@ -1,15 +1,15 @@
 package com.mth.academicfeesystem.modules.user.entity;
 
+import java.time.LocalDate;
+
 import com.mth.academicfeesystem.common.entity.AuditableEntity;
 import com.mth.academicfeesystem.common.enums.Gender;
+import com.mth.academicfeesystem.common.enums.Role;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,6 +31,8 @@ public class User extends AuditableEntity{
     private String password;
     @Column(nullable = false, length = 100)
     private String fullName;
+    @Column(nullable = false)
+    private LocalDate dateOfBirth;
     @Column(length = 15)
     private String phone;
     @Column(length = 100,unique = true)
@@ -40,9 +42,8 @@ public class User extends AuditableEntity{
     private Gender gender;
     @Builder.Default
     @Column(nullable = false)
-    private boolean isActive = true;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id", nullable = false)
+    private boolean active = true;
+    @Enumerated(EnumType.STRING)
     private Role role;
 
 }
