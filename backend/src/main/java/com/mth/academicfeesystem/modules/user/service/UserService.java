@@ -10,4 +10,5 @@ public interface UserService {
     MyProfileResponse updateMyProfile(Long userId,UpdateProfileRequest request);
     void changePassword(Long userId, ChangePasswordRequest request);
     void changeActive(Long userId, ChangeActiveRequest request);
+    void resetPassword(Long userId);
 }

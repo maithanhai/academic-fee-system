@@ -14,6 +14,7 @@ import com.mth.academicfeesystem.modules.academic.entity.ClassEnrollment;
 import com.mth.academicfeesystem.modules.academic.mapper.ClassEnrollmentMapper;
 import com.mth.academicfeesystem.modules.academic.mapper.CohortMapper;
 import com.mth.academicfeesystem.modules.people.dto.request.StudentRequest;
+import com.mth.academicfeesystem.modules.people.dto.request.UpdateStudentByAdminRequest;
 import com.mth.academicfeesystem.modules.people.dto.response.StudentDetailResponse;
 import com.mth.academicfeesystem.modules.people.dto.response.StudentResponse;
 import com.mth.academicfeesystem.modules.people.entity.Student;
@@ -75,4 +76,8 @@ public interface StudentMapper {
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "address", source = "address")
     void registerToStudent(RegisterStudentRequest request,@MappingTarget Student student);
+
+    @BeanMapping(ignoreByDefault = true)
+    void toEntity(UpdateStudentByAdminRequest request,@MappingTarget Student student);
+
 }

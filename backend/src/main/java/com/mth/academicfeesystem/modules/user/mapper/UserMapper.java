@@ -6,6 +6,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
+import com.mth.academicfeesystem.modules.people.dto.request.UpdateStudentByAdminRequest;
+import com.mth.academicfeesystem.modules.people.dto.request.UpdateTeacherByAdminRequest;
 import com.mth.academicfeesystem.modules.people.entity.Student;
 import com.mth.academicfeesystem.modules.people.entity.Teacher;
 import com.mth.academicfeesystem.modules.people.mapper.StudentMapper;
@@ -41,4 +43,12 @@ public interface UserMapper {
     @Mapping(target = "phone",source = "phone")
     @Mapping(target = "email", source = "email")
     void registerTeacherToUser(RegisterTeacherRequest request,@MappingTarget User user);
+
+    @BeanMapping(ignoreByDefault = true)
+    void toEntity(UpdateTeacherByAdminRequest request,@MappingTarget User user);
+    
+    @BeanMapping(ignoreByDefault = true)
+    void toEntity(UpdateStudentByAdminRequest request,@MappingTarget User user);
+
+
 }

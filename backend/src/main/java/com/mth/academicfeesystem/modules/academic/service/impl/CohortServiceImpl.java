@@ -19,8 +19,9 @@ import lombok.RequiredArgsConstructor;
 public class CohortServiceImpl implements CohortService {
     private final CohortRepository cohortRepo;
     private final CohortMapper cohortMapper;
+
     @Override
-    public List<CohortResponse> getAllCohorts(){
+    public List<CohortResponse> getAllCohorts() {
         return cohortMapper.toResponseList(cohortRepo.findAll());
     }
 
@@ -29,7 +30,7 @@ public class CohortServiceImpl implements CohortService {
         Cohort cohort = new Cohort();
         LocalDate currentDate = LocalDate.now();
         cohort.setName(String.valueOf(currentDate.getYear()));
-        if (cohortRepo.existsByName(cohort.getName())){
+        if (cohortRepo.existsByName(cohort.getName())) {
             throw new DuplicateResourceException("Cohort already exists");
         }
         Cohort cohortSaved = cohortRepo.save(cohort);
