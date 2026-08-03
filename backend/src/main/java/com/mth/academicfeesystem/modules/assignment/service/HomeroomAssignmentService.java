@@ -1,5 +1,5 @@
 package com.mth.academicfeesystem.modules.assignment.service;
 
-public class HomeroomAssignmentService {
+public interface HomeroomAssignmentService {
 
 }

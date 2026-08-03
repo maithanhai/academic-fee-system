@@ -39,12 +39,12 @@
 ---
 
 ## 4. Module Lớp học & Xếp lớp (Class & Enrollment)
-- [ ] `GET /api/admin/classes` — Lấy danh sách Lớp (Lọc theo Năm, Khóa)
-- [ ] `POST /api/admin/classes` — Tạo thủ công 1 Lớp học mới
-- [ ] `POST /api/admin/classes/auto-promote` — Lên lớp tự động ( VD: 10A1 -> 11A1)
-- [ ] `GET /api/admin/classes/{classId}/students` — Xem danh sách học sinh của 1 Lớp
-- [ ] `POST /api/admin/class-enrollments/import` — Import học sinh vào lớp (Khối 10 đầu vào)
-- [ ] `PUT /api/admin/class-enrollments/transfer` — Chuyển 1 học sinh sang lớp khác
+- [x] `GET /api/admin/classes` — Lấy danh sách Lớp (Lọc theo Năm, Khóa)
+- [x] `POST /api/admin/classes` — Tạo thủ công 1 Lớp học mới
+- [x] `POST /api/admin/classes/auto-promote` — Lên lớp tự động ( VD: 10A1 -> 11A1)
+- [x] `GET /api/admin/classes/{classId}/students` — Xem danh sách học sinh của 1 Lớp
+- [x] `POST /api/admin/class-enrollments/import` — Import học sinh vào lớp (Khối 10 đầu vào)
+- [x] `PUT /api/admin/class-enrollments/transfer` — Chuyển 1 học sinh sang lớp khác
 
 ---
 

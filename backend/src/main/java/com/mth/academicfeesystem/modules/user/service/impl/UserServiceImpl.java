@@ -82,4 +82,14 @@ public class UserServiceImpl implements UserService{
             userRepo.save(user);
         }
     }
+
+    @Transactional
+    @Override
+    public void resetPassword(Long userId){
+        User user = userRepo.findById(userId)
+            .orElseThrow(()->new ResourceNotFoundException("User not found"));
+        String password = String.valueOf(user.getDateOfBirth());
+        user.setPassword(passwordEncoder.encode(password));
+        userRepo.save(user);
+    }
 }
