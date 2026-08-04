@@ -1,5 +1,10 @@
 package com.mth.academicfeesystem.modules.assignment.dto.request;
 
-public class HomeroomAssignmentRequest {
+import jakarta.validation.constraints.NotNull;
 
-}
+public record HomeroomAssignmentRequest (
+    @NotNull(message = "ID class not null")
+    Long classId,
+    @NotNull(message = "ID teacher not null")
+    Long teacherId
+){}

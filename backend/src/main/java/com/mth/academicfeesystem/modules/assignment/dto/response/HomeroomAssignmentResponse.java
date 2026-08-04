@@ -1,5 +1,15 @@
 package com.mth.academicfeesystem.modules.assignment.dto.response;
 
-public class HomeroomAssignmentResponse {
+import java.time.LocalDate;
+
+public record HomeroomAssignmentResponse (
+    Long id,
+    Long classId,
+    String className,
+    Long teacherId,
+    String teacherName,
+    LocalDate startDate,
+    String status
+){
 
 }
