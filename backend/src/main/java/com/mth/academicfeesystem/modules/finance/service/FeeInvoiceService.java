@@ -1,5 +1,9 @@
 package com.mth.academicfeesystem.modules.finance.service;
 
-public class FeeInvoiceService {
+import com.mth.academicfeesystem.modules.finance.dto.request.InvoicePaymentRequest;
+import com.mth.academicfeesystem.modules.finance.dto.request.InvoiceUndoRequest;
 
-}
+public interface FeeInvoiceService{
+    void payInvoice(Long invoiceId, Long actionById, InvoicePaymentRequest request);
+    void undoInvoice(Long invoiceId, Long actionById, InvoiceUndoRequest request);
+} 

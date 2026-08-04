@@ -1,29 +1,19 @@
 package com.mth.academicfeesystem.modules.academic.service.impl;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.mth.academicfeesystem.common.enums.EnrollmentStatus;
 import com.mth.academicfeesystem.common.exception.DuplicateResourceException;
-import com.mth.academicfeesystem.common.exception.ResourceNotFoundException;
 import com.mth.academicfeesystem.modules.academic.dto.response.AcademicYearResponse;
 import com.mth.academicfeesystem.modules.academic.entity.AcademicYear;
-import com.mth.academicfeesystem.modules.academic.entity.ClassEnrollment;
 import com.mth.academicfeesystem.modules.academic.entity.Cohort;
-import com.mth.academicfeesystem.modules.academic.entity.SchoolClass;
 import com.mth.academicfeesystem.modules.academic.entity.Semester;
 import com.mth.academicfeesystem.modules.academic.mapper.AcademicYearMapper;
 import com.mth.academicfeesystem.modules.academic.repository.AcademicYearRepository;
-import com.mth.academicfeesystem.modules.academic.repository.ClassEnrollmentRepository;
 import com.mth.academicfeesystem.modules.academic.repository.CohortRepository;
-import com.mth.academicfeesystem.modules.academic.repository.SchoolClassRepository;
 import com.mth.academicfeesystem.modules.academic.repository.SemesterRepository;
 import com.mth.academicfeesystem.modules.academic.service.AcademicYearService;
 

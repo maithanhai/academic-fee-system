@@ -8,5 +8,5 @@ import com.mth.academicfeesystem.modules.assignment.entity.TeachingAssignment;
 
 public interface TeachingAssignmentRepository extends JpaRepository<TeachingAssignment, Long> {
     Optional<TeachingAssignment> findBySchoolClassIdAndSubjectId(Long classId, Long subjectId);
-
+    boolean existsByTeacherIdAndSchoolClassIdAndSubjectId(Long teacherId, Long classId, Long subjectId);
 }

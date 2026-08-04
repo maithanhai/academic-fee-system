@@ -36,6 +36,7 @@ public class TeachingAssignmentController {
     public ResponseEntity<ApiResponse<Void>> bulkSaveAssignments(
         @Valid @RequestBody BulkTeachingAssignmentRequest request){
         teachingAssignmentService.bulkSaveAssignments(request);
-        return ResponseEntity.ok(new ApiResponse<>("Phân công xử lý thành công"));
+        return ResponseEntity.ok(new ApiResponse<>("Phân công giáo viên bộ môn thành công"));
     }
 }
+// @PreAuthorize("@assignmentGuard.isSubjectTeacher(principal.id, #request.classId, #request.subjectId)")

@@ -1,5 +1,13 @@
 package com.mth.academicfeesystem.modules.audit.dto.response;
 
-public class AuditLogResponse {
+import java.time.LocalDateTime;
 
-}
+public record AuditLogResponse(
+    Long id,
+    String actorFullName,
+    String action,
+    String targetTable,
+    String payload,
+    String ipAddress,
+    LocalDateTime createdDate
+) {}

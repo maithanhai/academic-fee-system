@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import com.mth.academicfeesystem.common.entity.BaseEntity;
 import com.mth.academicfeesystem.modules.user.entity.User;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -29,9 +30,13 @@ public class AuditLog extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     private User user;
+    @Column(nullable = false, length = 50)
     private String action;
+    @Column(name = "target_table", nullable = false, length = 50)
     private String targetTable;
+
     private String payload;
+    @Column(name = "ip_address", length = 45)
     private String ipAddress;
     @CreationTimestamp
     private LocalDateTime createdDate;
