@@ -3,7 +3,6 @@ package com.mth.academicfeesystem.modules.assignment.service.impl;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,9 +18,6 @@ import com.mth.academicfeesystem.modules.assignment.repository.HomeroomAssignmen
 import com.mth.academicfeesystem.modules.assignment.service.HomeroomAssignmentService;
 import com.mth.academicfeesystem.modules.people.entity.Teacher;
 import com.mth.academicfeesystem.modules.people.repository.TeacherRepository;
-import com.mth.academicfeesystem.modules.user.entity.User;
-import com.mth.academicfeesystem.modules.user.repository.UserRepository;
-
 import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
@@ -29,7 +25,6 @@ public class HomeroomAssignmentServiceImpl implements HomeroomAssignmentService{
     private final SchoolClassRepository schoolClassRepo;
     private final TeacherRepository teacherRepo;
     private final HomeroomAssignmentRepository homeroomAssignmentRepo;
-    private final UserRepository userRepo;
 
     @Transactional
     @Override
@@ -88,10 +83,8 @@ public class HomeroomAssignmentServiceImpl implements HomeroomAssignmentService{
 
     @Transactional
     @Override
-    public HomeroomAssignmentResponse getMyHomeroomClass(UserDetails userDetails) {
-        User user = userRepo.findByUsername(userDetails.getUsername())
-            .orElseThrow(()->new ResourceNotFoundException("Không tìm thấy user"));
-        Teacher teacher = teacherRepo.findById(user.getId())
+    public HomeroomAssignmentResponse getMyHomeroomClass(Long userId) {
+        Teacher teacher = teacherRepo.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy giáo viên"));
 
         HomeroomAssignment assignment = homeroomAssignmentRepo.findByTeacherIdAndStatus(teacher.getId(), AssignmentStatus.ACTIVE)

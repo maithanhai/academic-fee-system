@@ -9,13 +9,10 @@ import org.mapstruct.MappingTarget;
 import org.springframework.data.domain.Page;
 
 import com.mth.academicfeesystem.common.response.PageResponse;
-import com.mth.academicfeesystem.modules.people.dto.request.UpdateTeacherByAdminRequest;
 import com.mth.academicfeesystem.modules.people.dto.response.TeacherDetailResponse;
 import com.mth.academicfeesystem.modules.people.dto.response.TeacherResponse;
 import com.mth.academicfeesystem.modules.people.entity.Teacher;
 import com.mth.academicfeesystem.modules.user.dto.request.RegisterTeacherRequest;
-import com.mth.academicfeesystem.modules.user.entity.User;
-
 @Mapper(componentModel = "spring",
     uses = {DepartmentMapper.class}
 )

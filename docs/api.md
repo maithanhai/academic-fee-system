@@ -49,24 +49,24 @@
 ---
 
 ## 5. Module Phân công (Assignment)
-- [ ] `POST /api/admin/homeroom-assignments` — Phân công Giáo viên chủ nhiệm cho Lớp
-- [ ] `PUT /api/admin/homeroom-assignments/{id}/end` — Kết thúc/Hủy phân công chủ nhiệm
-- [ ] `GET /api/teachers/me/homeroom-classes` — GV xem danh sách Lớp mình đang chủ nhiệm
-- [ ] `POST /api/admin/teaching-assignments` — Phân công Giáo viên dạy bộ môn cho Lớp
-- [ ] `DELETE /api/admin/teaching-assignments/{id}` — Gỡ phân công bộ môn
-- [ ] `GET /api/teachers/me/teaching-assignments` — GV xem lịch/danh sách lớp+môn mình dạy
+- [X] `POST /api/admin/homeroom-assignments` — Phân công Giáo viên chủ nhiệm cho Lớp
+- [X] `PUT /api/admin/homeroom-assignments/{id}/end` — Kết thúc/Hủy phân công chủ nhiệm
+- [X] `GET /api/teachers/me/homeroom-classes` — GV xem danh sách Lớp mình đang chủ nhiệm
+- [X] `POST /api/admin/teaching-assignments` — Phân công Giáo viên dạy bộ môn cho Lớp
+- [X] `DELETE /api/admin/teaching-assignments/{id}` — Gỡ phân công bộ môn
+- [X] `GET /api/teachers/me/teaching-assignments` — GV xem lịch/danh sách lớp+môn mình dạy
 
 ---
 
 ## 6. Module Quản lý Điểm số (Grade)
-- [ ] `GET /api/admin/grade-configs` — Xem cấu hình điểm (Hệ số, số cột)
-- [ ] `POST /api/admin/grade-configs` — Tạo cấu hình điểm cho môn học
-- [ ] `PUT /api/admin/grade-configs/{id}` — Sửa cấu hình điểm
-- [ ] `POST /api/teachers/grades` — GV nhập điểm (Chỉ được nhập lớp mình dạy)
-- [ ] `PUT /api/teachers/grades/{id}` — GV sửa điểm (Yêu cầu lưu Audit log)
-- [ ] `GET /api/teachers/classes/{classId}/subjects/{subjectId}/grades` — GV xem bảng điểm lớp mình dạy
+- [X] `GET /api/admin/grade-configs` — Xem cấu hình điểm (Hệ số, số cột)
+- [X] `POST /api/admin/grade-configs` — Tạo cấu hình điểm cho môn học
+- [X] `PUT /api/admin/grade-configs/{id}` — Sửa cấu hình điểm
+- [X] `POST /api/teachers/grades` — GV nhập điểm (Chỉ được nhập lớp mình dạy)
+- [X] `PUT /api/teachers/grades/{id}` — GV sửa điểm (Yêu cầu lưu Audit log)
+- [X] `GET /api/teachers/classes/{classId}/subjects/{subjectId}/grades` — GV xem bảng điểm lớp mình dạy
 - [ ] `GET /api/teachers/homeroom-classes/{classId}/grade-summary` — GVCN xem thống kê điểm toàn lớp mình chủ nhiệm
-- [ ] `GET /api/students/me/grades` — Học sinh tự xem bảng điểm cá nhân
+- [X] `GET /api/students/me/grades` — Học sinh tự xem bảng điểm cá nhân
 
 ---
 
