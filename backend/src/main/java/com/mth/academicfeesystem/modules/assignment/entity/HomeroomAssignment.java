@@ -33,7 +33,8 @@ public class HomeroomAssignment extends BaseEntity{
     private LocalDate startDate;
     private LocalDate endDate;
     @Enumerated(EnumType.STRING)
-    private AssignmentStatus status;
+    @Builder.Default
+    private AssignmentStatus status=AssignmentStatus.ACTIVE;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="class_id",nullable = false)
     private SchoolClass schoolClass;

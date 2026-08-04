@@ -11,4 +11,5 @@ public interface SchoolClassRepository extends JpaRepository<SchoolClass,Long>, 
     boolean existsByAcademicYearIdAndGradeLevelIn(Long academicYearId, List<Integer> gradeLevel);
     List<SchoolClass> findByAcademicYearIdAndGradeLevelIn(Long academicYearId,List<Integer> gradeLevel);
     List<SchoolClass> findByAcademicYearId(Long academicYearId);
+    List<SchoolClass> findByGradeLevel(Integer gradeLevel);
 }
