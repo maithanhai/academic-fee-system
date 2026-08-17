@@ -40,7 +40,7 @@ public class Fee extends BaseEntity{
     private LocalDate dueDate;
     @Column(nullable = false)
     @Builder.Default
-    private Boolean isActive=true;
+    private Boolean active=true;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="academic_year_id",nullable = false)
     private AcademicYear academicYear;

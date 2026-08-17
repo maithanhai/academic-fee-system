@@ -23,7 +23,6 @@
 - date_of_birth
 - address
 - phone_parent
-- avatar (Cloudinary)
 - cohort_id (FK -> cohort.id)
 ```
 

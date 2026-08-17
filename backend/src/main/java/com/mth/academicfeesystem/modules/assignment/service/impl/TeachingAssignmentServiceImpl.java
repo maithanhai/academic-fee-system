@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.mth.academicfeesystem.common.exception.BusinessException;
 import com.mth.academicfeesystem.common.exception.ResourceNotFoundException;
 import com.mth.academicfeesystem.modules.academic.entity.SchoolClass;
 import com.mth.academicfeesystem.modules.academic.entity.Subject;
@@ -33,6 +34,8 @@ public class TeachingAssignmentServiceImpl implements TeachingAssignmentService 
 
     @Override
     public List<TeachingAssignmentResponse> previewAutoAssign(Integer gradeLevel) {
+        if (gradeLevel<10||gradeLevel>12) 
+            throw new BusinessException("Khối lớp không hợp lệ"); 
         List<TeachingAssignmentResponse> previewList = new ArrayList<>();
         List<SchoolClass> schoolClasses = classRepo.findByGradeLevel(gradeLevel);
         List<Subject> subjects = subjectRepo.findAll();

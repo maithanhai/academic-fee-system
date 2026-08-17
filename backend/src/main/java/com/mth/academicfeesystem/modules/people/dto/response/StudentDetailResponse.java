@@ -6,7 +6,6 @@ import com.mth.academicfeesystem.modules.academic.dto.response.ClassEnrollmentDe
 import com.mth.academicfeesystem.modules.academic.dto.response.CohortResponse;
 
 public record StudentDetailResponse(
-    String avatar,
     String address,
     String phoneParent,
     CohortResponse cohort,
