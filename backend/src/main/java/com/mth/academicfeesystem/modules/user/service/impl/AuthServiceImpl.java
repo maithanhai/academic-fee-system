@@ -1,10 +1,12 @@
 package com.mth.academicfeesystem.modules.user.service.impl;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -38,8 +40,10 @@ import com.mth.academicfeesystem.modules.user.dto.request.RefreshTokenRequest;
 import com.mth.academicfeesystem.modules.user.dto.request.RegisterStudentRequest;
 import com.mth.academicfeesystem.modules.user.dto.request.RegisterTeacherRequest;
 import com.mth.academicfeesystem.modules.user.dto.response.LoginResponse;
+import com.mth.academicfeesystem.modules.user.entity.RefreshToken;
 import com.mth.academicfeesystem.modules.user.entity.User;
 import com.mth.academicfeesystem.modules.user.mapper.UserMapper;
+import com.mth.academicfeesystem.modules.user.repository.RefreshTokenRepository;
 import com.mth.academicfeesystem.modules.user.repository.UserRepository;
 import com.mth.academicfeesystem.modules.user.service.AuthService;
 import com.mth.academicfeesystem.security.CustomUserPrincipal;
@@ -65,7 +69,9 @@ public class AuthServiceImpl implements AuthService {
     private final TeacherRepository teacherRepo;
     private final SubjectRepository subjectRepo;
     private final TeacherExpertiseRepository teacherExpertiseRepo;
-
+    private final RefreshTokenRepository refreshTokenRepo;
+    @Value("${jwt.refresh-expiration}")
+    private long refreshExpiration;
     @Override
     public LoginResponse login(LoginRequest request) {
         Authentication authentication;
@@ -85,7 +91,25 @@ public class AuthServiceImpl implements AuthService {
         String role = userPrincipal.getUser().getRole().name();
         String accessToken = jwtTokenProvider.generateAccessToken(userId, username, role);
         String refreshToken = jwtTokenProvider.generateRefreshToken(userId, username);
-        return new LoginResponse(accessToken, refreshToken, "Bearer", userId, username, fullName, role);
+        
+        RefreshToken refreshTokenEntity = RefreshToken.builder()
+            .token(refreshToken)
+            .expiryDate(Instant.now().plusMillis(refreshExpiration))
+            .revoked(false)
+            .user(userPrincipal.getUser())
+            .build();
+        refreshTokenRepo.save(refreshTokenEntity);
+
+        new LoginResponse(accessToken, refreshToken, "Bearer", userId, username, fullName, role);
+        return LoginResponse.builder()
+            .accessToken(accessToken)
+            .refreshToken(refreshToken)
+            .tokenType("Bearer")
+            .userId(userId)
+            .username(username)
+            .fullname(fullName)
+            .role(role)
+            .build();
     }
 
     @Transactional
@@ -155,7 +179,6 @@ public class AuthServiceImpl implements AuthService {
 
             expertisesToSave.add(expertise);
         }
-
         teacherExpertiseRepo.saveAll(expertisesToSave);
     }
 
@@ -163,21 +186,44 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public LoginResponse refreshToken(RefreshTokenRequest request) {
         String refreshToken = request.refreshToken();
-        String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
-        User user = userRepo.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         if (!jwtTokenProvider.validateToken(refreshToken)) {
-            throw new BusinessException("Invalid refresh token");
+            throw new BusinessException("Refresh token không hợp lệ hoặc hết hạn");
         }
-        String newAccessToken = jwtTokenProvider.generateAccessToken(user.getId(), user.getUsername(),
-                user.getRole().name());
-        String newRefreshToken = jwtTokenProvider.generateRefreshToken(user.getId(), user.getUsername());
+        RefreshToken refreshTokenEntity = refreshTokenRepo.findByToken(refreshToken)
+                .orElseThrow(() -> new ResourceNotFoundException("Refresh token không tồn tại"));
+        if (refreshTokenEntity.isRevoked()) {
+            throw new BusinessException("Refresh token đã bị thu hồi. Vui lòng đăng nhập lại");
+        }
+        User user = refreshTokenEntity.getUser();
+        
+        String newAccessToken = jwtTokenProvider.generateAccessToken(user.getId(), user.getUsername(), user.getRole().name());
+        String newRefreshTokenString = jwtTokenProvider.generateRefreshToken(user.getId(), user.getUsername());
+
+        refreshTokenRepo.delete(refreshTokenEntity);
+        RefreshToken newRefreshTokenEntity = RefreshToken.builder()
+                .token(newRefreshTokenString)
+                .expiryDate(Instant.now().plusMillis(refreshExpiration))
+                .revoked(false)
+                .user(user)
+                .build();
+        refreshTokenRepo.save(newRefreshTokenEntity);
+
         return LoginResponse.builder()
                 .accessToken(newAccessToken)
-                .refreshToken(newRefreshToken)
+                .refreshToken(newRefreshTokenString)
                 .userId(user.getId())
                 .username(user.getUsername())
                 .role(user.getRole().name())
+                .fullname(user.getFullName())
+                .tokenType("Bearer")
                 .build();
+    }
+
+    @Transactional
+    @Override
+    public void logout(String refreshToken){
+        refreshTokenRepo.findByToken(refreshToken).ifPresent(token->{
+            refreshTokenRepo.delete(token);
+        });
     }
 }

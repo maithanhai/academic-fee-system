@@ -35,13 +35,13 @@ public class UserController {
         @AuthenticationPrincipal CustomUserPrincipal principal,
         @Valid @RequestBody UpdateProfileRequest request){
         MyProfileResponse response=userService.updateMyProfile(principal.getId(), request);
-        return ResponseEntity.ok(new ApiResponse<>("Update user succesful",response));
+        return ResponseEntity.ok(new ApiResponse<>("Cập nhật thông tin người dùng thành công",response));
     }
     @PutMapping("/password")
     public ResponseEntity<ApiResponse<?>> changePassword(
         @AuthenticationPrincipal CustomUserPrincipal principal,
         @Valid @RequestBody ChangePasswordRequest request){
         userService.changePassword(principal.getId(), request);
-        return ResponseEntity.ok(new ApiResponse<>("Update password succesfull"));
+        return ResponseEntity.ok(new ApiResponse<>("Thay đổi mật khẩu thành công"));
     }
 }

@@ -90,7 +90,3 @@ logging:
     root: INFO
     com.mth.academicfeesystem: DEBUG
     org.hibernate.SQL: DEBUG
-cloudinary:
-  cloud-name: "ducouuixg"
-  api-key: "222724154773865"
-  api-secret: "im6x_Bg68qbbPgx9RYalYAm5iwY"
