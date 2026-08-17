@@ -40,5 +40,4 @@ public class ClassEnrollment extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="student_id",nullable = false)
     private Student student;
-
 }

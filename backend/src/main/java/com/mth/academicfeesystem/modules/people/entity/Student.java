@@ -37,7 +37,6 @@ public class Student{
     private String address;
     @Column(length = 15)
     private String phoneParent;
-    private String avatar;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="id",nullable = false)
     @MapsId

@@ -25,7 +25,6 @@ import com.mth.academicfeesystem.modules.user.dto.request.RegisterStudentRequest
 )
 public interface StudentMapper {
     //Detail student
-    @Mapping(target = "avatar",source = "avatar")
     @Mapping(target = "address",source = "address")
     @Mapping(target = "phoneParent",source = "phoneParent")
     @Mapping(target = "currentClassName",source = "enrollments",qualifiedByName = "getActiveClassName")
