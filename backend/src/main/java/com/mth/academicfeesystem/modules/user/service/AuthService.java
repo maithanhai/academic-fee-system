@@ -11,4 +11,5 @@ public interface AuthService {
     void registerStudent(RegisterStudentRequest request);
     void registerTeacher(RegisterTeacherRequest request);
     LoginResponse refreshToken(RefreshTokenRequest request);
+    void logout(String refreshToken);
 } 

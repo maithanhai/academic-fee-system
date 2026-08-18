@@ -26,7 +26,7 @@ public class AuthController {
     @PostMapping("/auth/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid@RequestBody LoginRequest request){
         LoginResponse response=authService.login(request);
-        return ResponseEntity.ok(new ApiResponse<>("Login successful",response));
+        return ResponseEntity.ok(new ApiResponse<>("Đăng nhập thành công",response));
     }
 
     @PostMapping("/admin/students")
@@ -35,7 +35,7 @@ public class AuthController {
         @Valid @RequestBody RegisterStudentRequest request
     ){
         authService.registerStudent(request);
-        return ResponseEntity.ok(new ApiResponse<>("Create account student successful"));
+        return ResponseEntity.ok(new ApiResponse<>("Tạo tài khoản cho học sinh thành công"));
     }
 
     @PostMapping("/admin/teachers")
@@ -44,20 +44,23 @@ public class AuthController {
         @Valid @RequestBody RegisterTeacherRequest request
     ){
         authService.registerTeacher(request);
-        return ResponseEntity.ok(new ApiResponse<>("Create account for teacher successful"));
+        return ResponseEntity.ok(new ApiResponse<>("Tạo tài khoản cho giáo viên thành công"));
     }
 
-    @PostMapping("/api/auth/refresh")
+    @PostMapping("/auth/refresh")
     public ResponseEntity<ApiResponse<LoginResponse>> refreshToken(
         @Valid @RequestBody RefreshTokenRequest request
     ){
         LoginResponse response = authService.refreshToken(request);
-        return ResponseEntity.ok(new ApiResponse<>("Get new token successful",response));
+        return ResponseEntity.ok(new ApiResponse<>("Lấy token mới thành công",response));
     }
 
-    @PostMapping("/api/auth/logout")
-    public ResponseEntity<ApiResponse<?>> logout(){
-        return ResponseEntity.ok(new ApiResponse<>("Logout successful"));
+    @PostMapping("/auth/logout")
+    public ResponseEntity<ApiResponse<?>> logout(
+        @RequestBody RefreshTokenRequest request
+    ){
+        authService.logout(request.refreshToken());
+        return ResponseEntity.ok(new ApiResponse<>("Đăng xuất thành công"));
     }
     
 }
