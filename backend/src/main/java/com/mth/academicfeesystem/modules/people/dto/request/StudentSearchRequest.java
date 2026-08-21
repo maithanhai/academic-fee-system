@@ -11,9 +11,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class StudentSearchRequest{
-    private String username;
-    private String fullName;
-    private String cohort;
+    private String keyword;
+    private Long cohortId;
     private Boolean active;
+    private Integer gradeLevel;
     private Long classId;
 }

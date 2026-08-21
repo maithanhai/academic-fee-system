@@ -1,5 +1,9 @@
 package com.mth.academicfeesystem.modules.people.entity;
 
+import java.util.List;
+
+import org.hibernate.annotations.BatchSize;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mth.academicfeesystem.modules.user.entity.User;
 
@@ -9,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -35,4 +40,7 @@ public class Teacher {
     @JoinColumn(name="id",nullable = false)
     @JsonIgnore
     private User user;
+    @OneToMany(mappedBy = "teacher",fetch = FetchType.LAZY)
+    @BatchSize(size = 50)
+    private List<TeacherExpertise> expertises;
 }

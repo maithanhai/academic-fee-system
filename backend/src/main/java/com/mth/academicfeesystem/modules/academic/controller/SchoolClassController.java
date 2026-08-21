@@ -1,5 +1,7 @@
 package com.mth.academicfeesystem.modules.academic.controller;
 
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,24 +25,21 @@ import com.mth.academicfeesystem.modules.people.dto.request.StudentSearchRequest
 import com.mth.academicfeesystem.modules.people.dto.response.StudentResponse;
 import com.mth.academicfeesystem.modules.people.service.StudentService;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin")
-@PreAuthorize("hasAuthority('ADMIN')")
+@PreAuthorize("hasRole('ADMIN')")
 public class SchoolClassController {
     private final SchoolClassService schoolClassService;
     private final StudentService studentService;
 
     @GetMapping("/classes")
-    public ResponseEntity<ApiResponse<PageResponse<SchoolClassResponse>>> getAllClasses(
-            @Valid @RequestBody SchoolClassSearchRequest request,
-            Pageable pageable) {
-        PageResponse<SchoolClassResponse> response = schoolClassService.searchClasses(request, pageable);
-        return ResponseEntity.ok(new ApiResponse<>("Get all classes successfull", response));
+    public ResponseEntity<ApiResponse<List<SchoolClassResponse>>> getAllClasses() {
+        List<SchoolClassResponse> response = schoolClassService.getClasses();
+        return ResponseEntity.ok(new ApiResponse<>("Lấy danh sách lớp học thành công", response));
     }
 
     @PostMapping("/classes")

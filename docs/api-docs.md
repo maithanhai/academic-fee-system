@@ -10,23 +10,23 @@
 | 1 | `[x]` | `[x]` | **POST** | `/api/auth/login` | Đăng nhập, cấp Access + Refresh Token |
 | 2 | `[x]` | `[x]` | **POST** | `/api/auth/refresh` | Xin cấp Token mới bằng Refresh Token |
 | 3 | `[x]` | `[x]` | **POST** | `/api/auth/logout` | Đăng xuất, vô hiệu hóa Token |
-| 4 | `[x]` | `[ ]` | **GET** | `/api/users/me` | Lấy thông tin hồ sơ của chính mình |
-| 5 | `[x]` | `[ ]` | **PUT** | `/api/users/me/profile` | Tự cập nhật hồ sơ cá nhân |
-| 6 | `[x]` | `[ ]` | **PUT** | `/api/users/me/password` | Đổi mật khẩu cá nhân |
+| 4 | `[x]` | `[x]` | **GET** | `/api/users/me` | Lấy thông tin hồ sơ của chính mình |
+| 5 | `[x]` | `[x]` | **PUT** | `/api/users/me/profile` | Tự cập nhật hồ sơ cá nhân |
+| 6 | `[x]` | `[x]` | **PUT** | `/api/users/me/password` | Đổi mật khẩu cá nhân |
 
 ### 2. Module Quản lý Nhân sự (Admin)
 
 | STT | Code | Test | Method | API Endpoint | Mô tả chức năng |
 | :---: | :---: | :---: | :--- | :--- | :--- |
-| 7 | `[x]` | `[ ]` | **GET** | `/api/admin/teachers` | Lấy danh sách Giáo viên |
-| 8 | `[x]` | `[ ]` | **GET** | `/api/admin/teachers/{id}` | Xem chi tiết 1 Giáo viên |
+| 7 | `[x]` | `[x]` | **GET** | `/api/admin/teachers` | Lấy danh sách Giáo viên |
+| 8 | `[x]` | `[x]` | **GET** | `/api/admin/teachers/{id}` | Xem chi tiết 1 Giáo viên |
 | 9 | `[x]` | `[ ]` | **POST** | `/api/admin/teachers` | Tạo mới Giáo viên |
-| 10 | `[ ]` | `[ ]` | **PUT** | `/api/admin/teachers/{id}` | Cập nhật hồ sơ Giáo viên |
-| 11 | `[x]` | `[ ]` | **GET** | `/api/admin/students` | Lấy danh sách Học sinh |
-| 12 | `[x]` | `[ ]` | **GET** | `/api/admin/students/{id}` | Xem chi tiết 1 Học sinh |
+| 10 | `[x]` | `[x]` | **PUT** | `/api/admin/teachers/{id}` | Cập nhật hồ sơ Giáo viên |
+| 11 | `[x]` | `[x]` | **GET** | `/api/admin/students` | Lấy danh sách Học sinh |
+| 12 | `[x]` | `[x]` | **GET** | `/api/admin/students/{id}` | Xem chi tiết 1 Học sinh |
 | 13 | `[x]` | `[ ]` | **POST** | `/api/admin/students` | Tạo mới Học sinh |
-| 14 | `[ ]` | `[ ]` | **PUT** | `/api/admin/students/{id}` | Cập nhật toàn bộ thông tin Học sinh |
-| 15 | `[x]` | `[ ]` | **PATCH** | `/api/admin/students/{id}/status` | Đổi trạng thái Học sinh (Bảo lưu/Đình chỉ) |
+| 14 | `[x]` | `[x]` | **PUT** | `/api/admin/students/{id}` | Cập nhật toàn bộ thông tin Học sinh |
+| 15 | `[x]` | `[x]` | **PATCH** | `/api/admin/students/{id}/status` | Đổi trạng thái Học sinh (Bảo lưu/Đình chỉ) |
 
 ### 3. Module Khung Đào Tạo (Academic)
 

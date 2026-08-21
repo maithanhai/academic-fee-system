@@ -34,7 +34,7 @@ public class UserController {
     public ResponseEntity<ApiResponse<MyProfileResponse>> updateMyProfile(
         @AuthenticationPrincipal CustomUserPrincipal principal,
         @Valid @RequestBody UpdateProfileRequest request){
-        MyProfileResponse response=userService.updateMyProfile(principal.getId(), request);
+        MyProfileResponse response=userService.updateMyProfile(principal, request);
         return ResponseEntity.ok(new ApiResponse<>("Cập nhật thông tin người dùng thành công",response));
     }
     @PutMapping("/password")
