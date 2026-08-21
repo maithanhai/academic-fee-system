@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 @RestControllerAdvice
@@ -68,11 +69,12 @@ public class GlobalExceptionHandler {
     }
 
     private ErrorResponse buildErrorResponse(HttpStatus status, Exception ex, HttpServletRequest request) {
-        return new ErrorResponse(
-                status.value(),
-                status.name(),
-                ex.getMessage(),
-                request.getRequestURI(),
-                LocalDateTime.now().toString());
+        return ErrorResponse.builder()
+                    .status(status.value())
+                    .error(status.name())
+                    .message(ex.getMessage())
+                    .path(request.getRequestURI())
+                    .timestamp(LocalDateTime.now().toString())
+                    .build();
     }
 }

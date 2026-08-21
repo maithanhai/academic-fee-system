@@ -66,23 +66,23 @@ public class SchoolClassServiceImpl implements SchoolClassService {
     // Nằm trong SchoolClassService.java
 
     @Override
-    public PageResponse<SchoolClassResponse> searchClasses(SchoolClassSearchRequest request, Pageable pageable) {
-        Specification<SchoolClass> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (request.getClassName() != null && !request.getClassName().trim().isEmpty()) {
-                predicates.add(cb.like(cb.lower(root.get("className")),
-                        "%" + request.getClassName().trim().toLowerCase() + "%"));
-            }
-            if (request.getGradeLevel() != null) {
-                predicates.add(cb.equal(root.get("gradeLevel"), request.getGradeLevel()));
-            }
-            if (request.getAcademicYearId() != null) {
-                predicates.add(cb.equal(root.get("academicYear").get("id"), request.getAcademicYearId()));
-            }
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
-        Page<SchoolClass> classPage = schoolClassRepo.findAll(spec, pageable);
-        return schoolClassMapper.toPageResponse(classPage);
+    public List<SchoolClassResponse> getClasses() {
+        // Specification<SchoolClass> spec = (root, query, cb) -> {
+        //     List<Predicate> predicates = new ArrayList<>();
+        //     if (request.getClassName() != null && !request.getClassName().trim().isEmpty()) {
+        //         predicates.add(cb.like(cb.lower(root.get("className")),
+        //                 "%" + request.getClassName().trim().toLowerCase() + "%"));
+        //     }
+        //     if (request.getGradeLevel() != null) {
+        //         predicates.add(cb.equal(root.get("gradeLevel"), request.getGradeLevel()));
+        //     }
+        //     if (request.getAcademicYearId() != null) {
+        //         predicates.add(cb.equal(root.get("academicYear").get("id"), request.getAcademicYearId()));
+        //     }
+        //     return cb.and(predicates.toArray(new Predicate[0]));
+        // };
+        List<SchoolClass> classes = schoolClassRepo.findAll();
+        return schoolClassMapper.toListResponse(classes);
     }
 
     @Transactional

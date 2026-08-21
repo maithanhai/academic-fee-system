@@ -2,6 +2,8 @@ package com.mth.academicfeesystem.modules.people.entity;
 
 import java.util.List;
 
+import org.hibernate.annotations.BatchSize;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mth.academicfeesystem.modules.academic.entity.ClassEnrollment;
 import com.mth.academicfeesystem.modules.academic.entity.Cohort;
@@ -46,5 +48,6 @@ public class Student{
     @JoinColumn(name="cohort_id",nullable = false)
     private Cohort cohort;
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "student")
+    @BatchSize(size = 50)
     private List<ClassEnrollment> enrollments;
 }

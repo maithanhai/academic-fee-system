@@ -1,6 +1,7 @@
 package com.mth.academicfeesystem.modules.people.dto.response;
 
-public record TeacherResponse (
+public record TeacherListResponse (
+    Long id,
     String username,
     String fullName,
     DepartmentResponse department,

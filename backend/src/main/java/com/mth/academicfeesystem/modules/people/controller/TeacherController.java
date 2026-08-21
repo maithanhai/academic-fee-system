@@ -4,15 +4,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mth.academicfeesystem.common.response.ApiResponse;
-import com.mth.academicfeesystem.modules.people.dto.request.UpdateTeacherByAdminRequest;
+import com.mth.academicfeesystem.modules.people.dto.request.TeacherAdminUpdateRequest;
+import com.mth.academicfeesystem.modules.people.dto.response.TeacherDetailResponse;
 import com.mth.academicfeesystem.modules.people.service.TeacherService;
 import com.mth.academicfeesystem.modules.user.service.UserService;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -21,14 +22,14 @@ import lombok.RequiredArgsConstructor;
 public class TeacherController {
     private final TeacherService teacherService;
     private final UserService userService;
-    @PutMapping("/admin/teacher/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<ApiResponse<?>> updateTeacher(
+    @PutMapping("/admin/teachers/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<TeacherDetailResponse>> updateTeacher(
         @PathVariable Long id,
-        @RequestBody UpdateTeacherByAdminRequest request 
+        @RequestBody TeacherAdminUpdateRequest request 
     ){
-        teacherService.updateTeacher(id, request);
-        return ResponseEntity.ok(new ApiResponse<>("Update successful"));
+        TeacherDetailResponse response = teacherService.updateTeacher(id, request);
+        return ResponseEntity.ok(new ApiResponse<>("Cập nhật thông tin giáo viên thành công",response));
     }
 
     @PutMapping("/admin/teachers/{id}/reset-password")

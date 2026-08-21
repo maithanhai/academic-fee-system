@@ -13,6 +13,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,6 +51,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
             return header.substring(7);
+        }
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("access_token".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
         }
         return null;
     }

@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.mth.academicfeesystem.common.enums.Role;
 import com.mth.academicfeesystem.modules.user.entity.User;
 
 import lombok.Getter;
@@ -21,9 +22,12 @@ public class CustomUserPrincipal implements UserDetails{
     public Long getId(){
         return user.getId();
     }
+    public Role getRole(){
+        return user.getRole();
+    }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_"+user.getRole().name()));
+        return List.of(new SimpleGrantedAuthority(user.getRole().name()));
     }
 
     @Override

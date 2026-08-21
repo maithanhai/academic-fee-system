@@ -27,7 +27,7 @@ public class GradeConfigController {
     private final GradeConfigService gradeConfigService;
 
     @PostMapping("/admin/grade-config")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> createConfig(
         @Valid @RequestBody GradeConfigRequest request
     ){
@@ -36,7 +36,7 @@ public class GradeConfigController {
     }
 
     @PutMapping("/admin/grade-config/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> updateConfig(
         @Valid @RequestBody GradeConfigRequest request,
         @PathVariable Long configId

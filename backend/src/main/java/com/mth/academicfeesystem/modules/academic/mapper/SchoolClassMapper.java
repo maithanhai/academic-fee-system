@@ -6,6 +6,7 @@ import org.mapstruct.Mapper;
 import org.springframework.data.domain.Page;
 
 import com.mth.academicfeesystem.common.response.PageResponse;
+import com.mth.academicfeesystem.modules.academic.dto.response.SchoolClassListResponse;
 import com.mth.academicfeesystem.modules.academic.dto.response.SchoolClassResponse;
 import com.mth.academicfeesystem.modules.academic.entity.SchoolClass;
 
@@ -28,4 +29,7 @@ public interface SchoolClassMapper {
                 .data(content) 
                 .build();
     }
+    SchoolClassListResponse toResponseForList(SchoolClass schoolClass);
+
+    List<SchoolClassResponse> toListResponse(List<SchoolClass> classes);
 }

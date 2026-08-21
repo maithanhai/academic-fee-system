@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-@PreAuthorize("hasAuthority('ADMIN')")
+@PreAuthorize("hasRole('ADMIN')")
 public class ClassEnrollmentController {
     private final ClassEnrollmentService classEnrollmentService;
     @PutMapping("/class-enrollments/tranfer")
@@ -25,6 +25,6 @@ public class ClassEnrollmentController {
         @RequestBody @Valid TransferStudentRequest request
     ) {
         classEnrollmentService.transferStudent(request);
-    return ResponseEntity.ok(new ApiResponse<>("Tranfer successful"));
+    return ResponseEntity.ok(new ApiResponse<>("Chuyển lớp thành công"));
     }
 }

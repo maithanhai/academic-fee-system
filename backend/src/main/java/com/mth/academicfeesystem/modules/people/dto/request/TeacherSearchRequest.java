@@ -10,8 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TeacherSearchRequest {
-    private String username;
-    private String fullName;
-    private String department;
+    private String keyword;
+    private Long departmentId;
     private Boolean active;
 }

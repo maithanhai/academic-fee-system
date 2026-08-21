@@ -14,9 +14,9 @@ import com.mth.academicfeesystem.common.response.PageResponse;
 import com.mth.academicfeesystem.modules.academic.entity.Subject;
 import com.mth.academicfeesystem.modules.academic.repository.SubjectRepository;
 import com.mth.academicfeesystem.modules.people.dto.request.TeacherSearchRequest;
-import com.mth.academicfeesystem.modules.people.dto.request.UpdateTeacherByAdminRequest;
+import com.mth.academicfeesystem.modules.people.dto.request.TeacherAdminUpdateRequest;
 import com.mth.academicfeesystem.modules.people.dto.response.TeacherDetailResponse;
-import com.mth.academicfeesystem.modules.people.dto.response.TeacherResponse;
+import com.mth.academicfeesystem.modules.people.dto.response.TeacherListResponse;
 import com.mth.academicfeesystem.modules.people.entity.Department;
 import com.mth.academicfeesystem.modules.people.entity.Teacher;
 import com.mth.academicfeesystem.modules.people.entity.TeacherExpertise;
@@ -29,7 +29,7 @@ import com.mth.academicfeesystem.modules.user.entity.User;
 import com.mth.academicfeesystem.modules.user.mapper.UserMapper;
 import com.mth.academicfeesystem.modules.user.repository.UserRepository;
 
-import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 
@@ -41,27 +41,27 @@ public class TeacherServiceImpl implements TeacherService {
     private final UserRepository userRepo;
     private final UserMapper userMapper;
     private final DepartmentRepository departmentRepo;
-    private final TeacherExpertiseRepository teacherExpertiseRepo;
     private final SubjectRepository subjectRepo;
 
     @Override
-    public PageResponse<TeacherResponse> searchTeachers(TeacherSearchRequest request, Pageable pageable) {
+    public PageResponse<TeacherListResponse> searchTeachers(TeacherSearchRequest request, Pageable pageable) {
         Specification<Teacher> spec = (root, query, cb) -> {
-            Join<Teacher, User> userJoin = root.join("user");
-            Join<Teacher, Department> cohortJoin = root.join("department");
+            if (query.getResultType() != Long.class && query.getResultType() != long.class) {
+                root.fetch("user", JoinType.LEFT);
+                root.fetch("department", JoinType.LEFT);
+                query.distinct(true);
+            }
             List<Predicate> predicates = new ArrayList<>();
-
-            if (request.getUsername() != null && !request.getUsername().trim().isEmpty()) {
-                predicates.add(cb.like(cb.lower(userJoin.get("username")),
-                        "%" + request.getUsername().trim().toLowerCase() + "%"));
+            var userJoin = root.join("user", JoinType.LEFT);
+            var departmentJoin = root.join("department", JoinType.LEFT);
+            if (request.getKeyword() != null && !request.getKeyword().trim().isEmpty()) {
+                String searchPattern = "%" + request.getKeyword().trim().toLowerCase() + "%";
+                predicates.add(cb.or(
+                        cb.like(cb.lower(userJoin.get("username")), searchPattern),
+                        cb.like(cb.lower(userJoin.get("fullName")), searchPattern)));
             }
-            if (request.getFullName() != null && !request.getFullName().trim().isEmpty()) {
-                predicates.add(cb.like(cb.lower(userJoin.get("fullName")),
-                        "%" + request.getFullName().trim().toLowerCase() + "%"));
-            }
-            if (request.getDepartment() != null && !request.getDepartment().isEmpty()) {
-                predicates.add(
-                        cb.like(cb.lower(cohortJoin.get("name")), "%" + request.getDepartment().toLowerCase() + "%"));
+            if (request.getDepartmentId() != null) {
+                predicates.add(cb.equal(departmentJoin.get("id"), request.getDepartmentId()));
             }
             if (request.getActive() != null) {
                 predicates.add(cb.equal(userJoin.get("active"), request.getActive()));
@@ -69,6 +69,7 @@ public class TeacherServiceImpl implements TeacherService {
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
+
         Page<Teacher> teacherPage = teacherRepo.findAll(spec, pageable);
         return teacherMapper.toPageResponse(teacherPage);
     }
@@ -82,36 +83,40 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Transactional
     @Override
-    public void updateTeacher(Long userId, UpdateTeacherByAdminRequest request) {
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    public TeacherDetailResponse updateTeacher(Long userId, TeacherAdminUpdateRequest request) {
+        System.out.println("DATA từ request: " + request);
         Teacher teacher = teacherRepo.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Teacher not found"));
+        User user = teacher.getUser();
         userMapper.toEntity(request, user);
         userRepo.save(user);
-        if (request.departmentId() != null && !request.departmentId().equals(teacher.getDepartment().getId())) {
-            Department department = departmentRepo.findById(request.departmentId())
+
+        if (request.getDepartmentId() != null && !request.getDepartmentId().equals(teacher.getDepartment().getId())) {
+            Department department = departmentRepo.findById(request.getDepartmentId())
                     .orElseThrow(() -> new ResourceNotFoundException("Department not found"));
             teacher.setDepartment(department);
             teacherRepo.save(teacher);
         }
 
-        if (request.subjectIds() != null && !request.subjectIds().isEmpty()) {
-            teacherExpertiseRepo.deleteByTeacherId(userId);
-            List<TeacherExpertise> newExpertises = new ArrayList<>();
-            for (Long subjectId : request.subjectIds()) {
-                Subject subject = subjectRepo.findById(subjectId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Subject not found: " + subjectId));
+        if (request.getSubjectIds() != null) {
+            teacher.getExpertises().removeIf(exp -> !request.getSubjectIds().contains(exp.getSubject().getId()));
+            List<Long> existingIds = teacher.getExpertises().stream()
+                    .map(exp -> exp.getSubject().getId())
+                    .toList();
+            for (Long subjectId : request.getSubjectIds()) {
+                if (!existingIds.contains(subjectId)) {
+                    Subject subject = subjectRepo.findById(subjectId)
+                            .orElseThrow(() -> new ResourceNotFoundException("Subject not found: " + subjectId));
 
-                TeacherExpertise expertise = TeacherExpertise.builder()
-                        .teacher(teacher)
-                        .subject(subject)
-                        .build();
+                    TeacherExpertise expertise = TeacherExpertise.builder()
+                            .teacher(teacher)
+                            .subject(subject)
+                            .build();
 
-                newExpertises.add(expertise);
+                    teacher.getExpertises().add(expertise);
+                }
             }
-
-            teacherExpertiseRepo.saveAll(newExpertises);
         }
+        return teacherMapper.toDetailResponse(teacher);
     }
 }

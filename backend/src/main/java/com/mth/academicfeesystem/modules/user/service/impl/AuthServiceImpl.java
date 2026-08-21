@@ -2,6 +2,7 @@ package com.mth.academicfeesystem.modules.user.service.impl;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -72,6 +73,7 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshTokenRepository refreshTokenRepo;
     @Value("${jwt.refresh-expiration}")
     private long refreshExpiration;
+
     @Override
     public LoginResponse login(LoginRequest request) {
         Authentication authentication;
@@ -91,25 +93,25 @@ public class AuthServiceImpl implements AuthService {
         String role = userPrincipal.getUser().getRole().name();
         String accessToken = jwtTokenProvider.generateAccessToken(userId, username, role);
         String refreshToken = jwtTokenProvider.generateRefreshToken(userId, username);
-        
+
         RefreshToken refreshTokenEntity = RefreshToken.builder()
-            .token(refreshToken)
-            .expiryDate(Instant.now().plusMillis(refreshExpiration))
-            .revoked(false)
-            .user(userPrincipal.getUser())
-            .build();
+                .token(refreshToken)
+                .expiryDate(Instant.now().plusMillis(refreshExpiration))
+                .revoked(false)
+                .user(userPrincipal.getUser())
+                .build();
         refreshTokenRepo.save(refreshTokenEntity);
 
         new LoginResponse(accessToken, refreshToken, "Bearer", userId, username, fullName, role);
         return LoginResponse.builder()
-            .accessToken(accessToken)
-            .refreshToken(refreshToken)
-            .tokenType("Bearer")
-            .userId(userId)
-            .username(username)
-            .fullname(fullName)
-            .role(role)
-            .build();
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .tokenType("Bearer")
+                .userId(userId)
+                .username(username)
+                .fullname(fullName)
+                .role(role)
+                .build();
     }
 
     @Transactional
@@ -117,24 +119,24 @@ public class AuthServiceImpl implements AuthService {
     public void registerStudent(RegisterStudentRequest request) {
         User user = new User();
         userMapper.registerStudentToUser(request, user);
-        user.setUsername(UUID.randomUUID().toString());
-        userRepo.save(user);
+
         Cohort cohort = cohortRepo.findById(request.cohortId())
-                .orElseThrow(() -> new RuntimeException("Cohort not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Cohort not found"));
+
         long currentStudentCount = studentRepo.countByCohortId(cohort.getId());
         String username = "hs" + cohort.getName() + String.format("%03d", currentStudentCount + 1);
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(String.valueOf(request.dateOfBirth())));
         userRepo.save(user);
+
         Student student = new Student();
         studentMapper.registerToStudent(request, student);
         student.setCohort(cohort);
         student.setUser(user);
         studentRepo.save(student);
 
-        SchoolClass schoolClass = schoolClassRepo.findById(request.schoolClassId()).orElseThrow(
-                () -> new ResourceNotFoundException("Class not found"));
-
+        SchoolClass schoolClass = schoolClassRepo.findById(request.schoolClassId())
+                .orElseThrow(() -> new ResourceNotFoundException("Class not found"));
         ClassEnrollment classEnrollment = ClassEnrollment.builder()
                 .student(student)
                 .schoolClass(schoolClass)
@@ -143,44 +145,54 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Transactional
-    @Override
-    public void registerTeacher(RegisterTeacherRequest request) {
-        User user = new User();
-        userMapper.registerTeacherToUser(request, user);
-        LocalDate date = LocalDate.now();
-        String[] nameParts = request.fullName().trim().split("\\s+");
-        StringBuilder firstLetterBuilder = new StringBuilder();
-        for (String part : nameParts) {
-            firstLetterBuilder.append(part.charAt(0));
-        }
-        String firstLetter = firstLetterBuilder.toString().toLowerCase();
-        String username = "gv" + String.valueOf(date).concat("/") + firstLetter;
-
-        user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(String.valueOf(request.dateOfBirth())));
-        userRepo.save(user);
-        Department department = departmentRepo.findById(request.departmentId())
-                .orElseThrow(() -> new ResourceNotFoundException("Department not found"));
-        Teacher teacher = new Teacher();
-        teacher.setDepartment(department);
-        teacher.setUser(user);
-        teacherRepo.save(teacher);
-
-        List<TeacherExpertise> expertisesToSave = new ArrayList<>();
-
-        for (Long subjectId : request.subjectIds()) {
-            Subject subject = subjectRepo.findById(subjectId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Subject not found with ID: " + subjectId));
-
-            TeacherExpertise expertise = TeacherExpertise.builder()
-                    .teacher(teacher)
-                    .subject(subject)
-                    .build();
-
-            expertisesToSave.add(expertise);
-        }
-        teacherExpertiseRepo.saveAll(expertisesToSave);
+@Override
+public void registerTeacher(RegisterTeacherRequest request) {
+    User user = new User();
+    userMapper.registerTeacherToUser(request, user);
+    LocalDate date = LocalDate.now();
+    String dateString = date.format(DateTimeFormatter.ofPattern("yyyyMMdd")); 
+    
+    String[] nameParts = request.fullName().trim().split("\\s+");
+    StringBuilder firstLetterBuilder = new StringBuilder();
+    for (String part : nameParts) {
+        firstLetterBuilder.append(part.charAt(0));
     }
+    String firstLetter = firstLetterBuilder.toString().toLowerCase();
+    String baseUsername = "gv" + dateString + firstLetter; 
+
+    String finalUsername = baseUsername;
+    int counter = 1;
+    while (userRepo.existsByUsername(finalUsername)) {
+        finalUsername = baseUsername + counter;
+        counter++;
+    }
+
+    user.setUsername(finalUsername);
+    user.setPassword(passwordEncoder.encode(String.valueOf(request.dateOfBirth())));
+    userRepo.save(user);
+
+    Department department = departmentRepo.findById(request.departmentId())
+            .orElseThrow(() -> new ResourceNotFoundException("Department not found"));
+    
+    Teacher teacher = new Teacher();
+    teacher.setDepartment(department);
+    teacher.setUser(user);
+    teacherRepo.save(teacher);
+
+    List<TeacherExpertise> expertisesToSave = new ArrayList<>();
+    for (Long subjectId : request.subjectIds()) {
+        Subject subject = subjectRepo.findById(subjectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Subject not found with ID: " + subjectId));
+
+        TeacherExpertise expertise = TeacherExpertise.builder()
+                .teacher(teacher)
+                .subject(subject)
+                .build();
+
+        expertisesToSave.add(expertise);
+    }
+    teacherExpertiseRepo.saveAll(expertisesToSave);
+}
 
     @Transactional
     @Override
@@ -195,8 +207,9 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException("Refresh token đã bị thu hồi. Vui lòng đăng nhập lại");
         }
         User user = refreshTokenEntity.getUser();
-        
-        String newAccessToken = jwtTokenProvider.generateAccessToken(user.getId(), user.getUsername(), user.getRole().name());
+
+        String newAccessToken = jwtTokenProvider.generateAccessToken(user.getId(), user.getUsername(),
+                user.getRole().name());
         String newRefreshTokenString = jwtTokenProvider.generateRefreshToken(user.getId(), user.getUsername());
 
         refreshTokenRepo.delete(refreshTokenEntity);
@@ -221,8 +234,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional
     @Override
-    public void logout(String refreshToken){
-        refreshTokenRepo.findByToken(refreshToken).ifPresent(token->{
+    public void logout(String refreshToken) {
+        refreshTokenRepo.findByToken(refreshToken).ifPresent(token -> {
             refreshTokenRepo.delete(token);
         });
     }

@@ -1,5 +1,9 @@
 package com.mth.academicfeesystem.modules.people.service;
 
-public interface DepartmentService {
+import java.util.List;
 
+import com.mth.academicfeesystem.modules.people.dto.response.DepartmentResponse;
+
+public interface DepartmentService {
+    List<DepartmentResponse> getDepartments();
 }
