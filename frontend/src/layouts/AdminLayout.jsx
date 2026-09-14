@@ -1,12 +1,12 @@
 import {
-  DashboardOutlined,TeamOutlined,UserOutlined,LogoutOutlined,AppstoreOutlined,ScheduleOutlined,ReadOutlined,
+  TeamOutlined,UserOutlined,LogoutOutlined,AppstoreOutlined,ScheduleOutlined,ReadOutlined,
   WalletOutlined,NotificationOutlined,HistoryOutlined,DownOutlined,KeyOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, theme, Typography, Space, message, Dropdown, Avatar } from "antd";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../store/slices/authSlice";
-import authApi from "../api/authApi";
+import { logout } from "../app/store/slices/authSlice";
+import authApi from "../features/auth/api/authApi";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Text } = Typography;
@@ -21,14 +21,13 @@ const AdminLayout = () => {
   const { fullname, username } = useSelector((state) => state.auth);
 
   const menuItems = [
-    { key: "/admin/dashboard", icon: <DashboardOutlined />, label: "Tổng quan" },
     { key: "/admin/users", icon: <TeamOutlined />, label: "Quản lý tài khoản" },
-    { key: "/admin/categories", icon: <AppstoreOutlined />, label: "Quản lý Danh mục" },
-    { key: "/admin/assignments", icon: <ScheduleOutlined />, label: "Phân công giảng dạy" },
-    { key: "/admin/grades", icon: <ReadOutlined />, label: "Quản lý Học vụ" },
-    { key: "/admin/finances", icon: <WalletOutlined />, label: "Quản lý tài chính" },
+    { key: "/admin/academics", icon: <AppstoreOutlined />, label: "Quản lý Danh mục" },
+    { key: "/admin/assignments", icon: <ScheduleOutlined />, label: "Phân công Giảng dạy" },
+    { key: "/admin/classes", icon: <ReadOutlined />, label: "Quản lý Lớp học" },
+    { key: "/admin/finances", icon: <WalletOutlined />, label: "Quản lý Tài chính" },
     { key: "/admin/notifications", icon: <NotificationOutlined />, label: "Quản lý Thông báo" },
-    { key: "/admin/audit-logs", icon: <HistoryOutlined />, label: "Nhật ký hệ thống" },
+    { key: "/admin/audit-logs", icon: <HistoryOutlined />, label: "Nhật ký Hệ thống" },
   ];
 
   const userMenuItems = [

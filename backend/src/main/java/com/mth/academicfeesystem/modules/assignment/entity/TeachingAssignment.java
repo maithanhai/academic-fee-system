@@ -26,7 +26,7 @@ import lombok.Setter;
 @Table(name="teaching_assignments",
     uniqueConstraints = {
         @UniqueConstraint(
-            columnNames = {"teacher_id","class_id","subject_id"},
+            columnNames = {"class_id","subject_id"},
             name = "uk_teaching_assignment"
         )
     }

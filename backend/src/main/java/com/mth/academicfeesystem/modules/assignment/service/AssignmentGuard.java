@@ -13,15 +13,16 @@ import lombok.RequiredArgsConstructor;
 public class AssignmentGuard {
 
     private final HomeroomAssignmentRepository homeroomAssignmentRepo;
-    private final TeachingAssignmentRepository teachingRepo;
+    private final TeachingAssignmentRepository teachingAssignmentRepo;
 
     //GVCN
     public boolean isHomeroomTeacher(Long teacherId, Long classId) {
         return homeroomAssignmentRepo.existsByTeacherIdAndSchoolClassIdAndStatus(teacherId, classId, AssignmentStatus.ACTIVE);
     }
 
-    //GVBM
-    public boolean isSubjectTeacher(Long teacherId, Long classId, Long subjectId) {
-        return teachingRepo.existsByTeacherIdAndSchoolClassIdAndSubjectId(teacherId, classId, subjectId);
+    //GVBM(nhập điểm, xem điểm)
+    public boolean canGradeSubject(Long teacherId, Long classId, Long subjectId) {
+        return teachingAssignmentRepo.existsByTeacherIdAndSchoolClassIdAndSubjectId(teacherId, classId, subjectId);
     }
+
 }

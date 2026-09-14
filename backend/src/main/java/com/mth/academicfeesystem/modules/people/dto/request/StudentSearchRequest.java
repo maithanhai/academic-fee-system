@@ -14,6 +14,4 @@ public class StudentSearchRequest{
     private String keyword;
     private Long cohortId;
     private Boolean active;
-    private Integer gradeLevel;
-    private Long classId;
 }

@@ -2,12 +2,16 @@ package com.mth.academicfeesystem.modules.academic.entity;
 
 import java.time.LocalDate;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import com.mth.academicfeesystem.common.entity.BaseEntity;
 import com.mth.academicfeesystem.common.enums.EnrollmentStatus;
 import com.mth.academicfeesystem.modules.people.entity.Student;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -27,11 +31,14 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name="class_enrollments")
+@EntityListeners(AuditingEntityListener.class)
 public class ClassEnrollment extends BaseEntity{
     @Enumerated(EnumType.STRING)
     @Column(length = 20,nullable = false)
-    private EnrollmentStatus status;
-    @Column(nullable = false)
+    @Builder.Default
+    private EnrollmentStatus status=EnrollmentStatus.ACTIVE;
+    @CreatedDate
+    @Column(name="start_date",updatable=false)
     private LocalDate startDate;
     private LocalDate endDate;
     @ManyToOne(fetch = FetchType.LAZY)

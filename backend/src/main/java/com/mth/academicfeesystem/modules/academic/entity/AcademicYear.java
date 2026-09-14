@@ -21,4 +21,7 @@ import lombok.Setter;
 public class AcademicYear extends BaseEntity{
     @Column(length = 20,nullable = false,unique = true)
     private String name;
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean active=true;
 }

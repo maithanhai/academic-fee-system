@@ -1,11 +1,13 @@
 import {
 UserOutlined,LogoutOutlined,NotificationOutlined,DownOutlined,IdcardOutlined,KeyOutlined,
+ProfileOutlined,
+CreditCardOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, theme, Typography, Space, message, Dropdown, Avatar } from "antd";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../store/slices/authSlice";
-import authApi from "../api/authApi";
+import { logout } from "../app/store/slices/authSlice";
+import authApi from "../features/auth/api/authApi";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Text } = Typography;
@@ -21,6 +23,8 @@ const StudentLayout = () => {
 
   const menuItems = [
     { key: "/student/notifications", icon: <NotificationOutlined />, label: "Thông báo" },
+    { key: "/student/grades", icon: <ProfileOutlined />, label: "Bảng điểm" },
+    { key: "/student/fees", icon: <CreditCardOutlined />, label: "Các đợt thu phí" },
   ];
 
   const userMenuItems = [

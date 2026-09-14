@@ -5,7 +5,10 @@ import lombok.Builder;
 @Builder
 public record SchoolClassListResponse(
     Long id, 
-    String name
+    String name,
+    Integer gradeLevel,
+    Long academicYearId,
+    Long totalStudents
 ) {
 
 }

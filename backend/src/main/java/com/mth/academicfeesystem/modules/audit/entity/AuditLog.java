@@ -34,7 +34,7 @@ public class AuditLog extends BaseEntity{
     private String action;
     @Column(name = "target_table", nullable = false, length = 50)
     private String targetTable;
-
+    @Column(columnDefinition = "TEXT")
     private String payload;
     @Column(name = "ip_address", length = 45)
     private String ipAddress;

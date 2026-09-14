@@ -17,6 +17,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,7 +30,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="fee_invoices")
+@Table(name="fee_invoices", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"student_id", "fee_id"}, name = "uk_fee_invoice_student_fee")
+})
 public class FeeInvoice extends AuditableEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="student_id",nullable = false)

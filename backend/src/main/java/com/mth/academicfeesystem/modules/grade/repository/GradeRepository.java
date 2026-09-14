@@ -1,7 +1,9 @@
 package com.mth.academicfeesystem.modules.grade.repository;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,4 +31,22 @@ public interface GradeRepository extends JpaRepository<Grade, Long> {
         List<Grade> findGradesByStudent(
                         @Param("studentId") Long studentId,
                         @Param("semesterId") Long semesterId);
+
+        @EntityGraph(attributePaths = { "semester", "subject" })
+        List<Grade> findByStudentId(Long studentId);
+
+        List<Grade> findBySubjectIdAndSemesterIdAndStudentIdIn(Long subjectId, Long semesterId,
+                        List<Long> studentIds);
+
+        Optional<Grade> findByStudentIdAndSubjectIdAndSemesterIdAndExamTypeAndOrdinalNumber(
+                        Long studentId, Long subjectId, Long semesterId, ExamType examType, Integer ordinalNumber);
+
+        @Query("""
+                            SELECT g FROM Grade g
+                            WHERE g.student.id = :studentId
+                              AND g.semester.academicYear.id = :academicYearId
+                        """)
+        List<Grade> findByStudentIdAndAcademicYearId(
+                        @Param("studentId") Long studentId,
+                        @Param("academicYearId") Long academicYearId);
 }

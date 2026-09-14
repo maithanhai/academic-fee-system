@@ -1,9 +1,12 @@
 package com.mth.academicfeesystem.modules.academic.entity;
 
 import com.mth.academicfeesystem.common.entity.BaseEntity;
+import com.mth.academicfeesystem.common.enums.SemesterName;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -23,7 +26,8 @@ import lombok.Setter;
 @Table(name="semesters")
 public class Semester extends BaseEntity{
     @Column(length = 20,nullable = false)
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private SemesterName name;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "academic_year_id",nullable = false)
     private AcademicYear academicYear;

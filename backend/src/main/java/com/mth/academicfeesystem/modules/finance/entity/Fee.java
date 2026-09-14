@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Formula;
 
 import com.mth.academicfeesystem.common.entity.BaseEntity;
 import com.mth.academicfeesystem.modules.academic.entity.AcademicYear;
@@ -41,6 +42,8 @@ public class Fee extends BaseEntity{
     @Column(nullable = false)
     @Builder.Default
     private Boolean active=true;
+    @Formula("(select count(fi.id) from fee_invoices fi where fi.fee_id = id)")
+    private Long invoiceCount;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="academic_year_id",nullable = false)
     private AcademicYear academicYear;

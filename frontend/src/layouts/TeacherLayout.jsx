@@ -1,19 +1,26 @@
 import {
-  DashboardOutlined,
   UserOutlined,
   LogoutOutlined,
   ScheduleOutlined,
   ReadOutlined,
-  NotificationOutlined,
   DownOutlined,
   IdcardOutlined,
   KeyOutlined,
 } from "@ant-design/icons";
-import { Layout,Menu,theme,Typography,Space,message,Dropdown,Avatar,} from "antd";
+import {
+  Layout,
+  Menu,
+  theme,
+  Typography,
+  Space,
+  message,
+  Dropdown,
+  Avatar,
+} from "antd";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../store/slices/authSlice";
-import authApi from "../api/authApi";
+import { logout } from "../app/store/slices/authSlice";
+import authApi from "../features/auth/api/authApi";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Text } = Typography;
@@ -31,24 +38,14 @@ const TeacherLayout = () => {
 
   const menuItems = [
     {
-      key: "/teacher/dashboard",
-      icon: <DashboardOutlined />,
-      label: "Tổng quan",
-    },
-    {
-      key: "/teacher/assignments",
+      key: "/teacher/homeroom-classes",
       icon: <ScheduleOutlined />,
-      label: "Lịch giảng dạy",
+      label: "Lớp chủ nhiệm",
     },
     {
-      key: "/teacher/grades",
+      key: "/teacher/teaching-classes",
       icon: <ReadOutlined />,
-      label: "Quản lý điểm số",
-    },
-    {
-      key: "/teacher/notifications",
-      icon: <NotificationOutlined />,
-      label: "Thông báo",
+      label: "Lớp giảng dạy",
     },
   ];
 
@@ -158,7 +155,7 @@ const TeacherLayout = () => {
           }}
         >
           <div style={{ fontSize: "18px", fontWeight: "bold" }}>
-            Cổng Thông Tin Giảng Viên
+            Cổng Thông Tin Giáo Viên
           </div>
 
           <Dropdown

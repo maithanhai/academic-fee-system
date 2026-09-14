@@ -1,5 +1,9 @@
 package com.mth.academicfeesystem.modules.grade.mapper;
 
-public class GradeConfigMapper {
+import org.mapstruct.Mapper;
+
+
+@Mapper(componentModel = "spring")
+public interface GradeConfigMapper {
 
 }

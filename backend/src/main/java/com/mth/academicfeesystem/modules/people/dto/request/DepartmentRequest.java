@@ -1,5 +1,7 @@
 package com.mth.academicfeesystem.modules.people.dto.request;
 
-public class DepartmentRequest {
+public record DepartmentRequest(
+    String name
+) {
 
 }
