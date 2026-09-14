@@ -7,8 +7,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,11 +20,6 @@ import com.mth.academicfeesystem.modules.people.dto.response.TeacherDetailRespon
 import com.mth.academicfeesystem.modules.people.dto.response.TeacherListResponse;
 import com.mth.academicfeesystem.modules.people.service.StudentService;
 import com.mth.academicfeesystem.modules.people.service.TeacherService;
-import com.mth.academicfeesystem.modules.user.dto.request.RegisterStudentRequest;
-import com.mth.academicfeesystem.modules.user.dto.request.RegisterTeacherRequest;
-import com.mth.academicfeesystem.modules.user.service.AuthService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -36,7 +29,6 @@ import lombok.RequiredArgsConstructor;
 public class AdminUserController {
     private final StudentService studentService;
     private final TeacherService teacherService;
-    private final AuthService authService;
     @GetMapping("/students")
     public ResponseEntity<ApiResponse<PageResponse<StudentResponse>>> getStudents(
         @ModelAttribute StudentSearchRequest request,
@@ -68,22 +60,6 @@ public class AdminUserController {
     ){
         TeacherDetailResponse response = teacherService.getTeacherById(id);
         return ResponseEntity.ok(new ApiResponse<>("Lấy danh sách giáo viên chi tiết thành công",response));
-    }
-
-    @PostMapping("/students")
-    public ResponseEntity<ApiResponse<?>> registerStudent(
-        @Valid @RequestBody RegisterStudentRequest request
-    ){
-        authService.registerStudent(request);
-        return ResponseEntity.ok(new ApiResponse<>("Tạo tài khoản cho học sinh thành công"));
-    }
-
-    @PostMapping("/teachers")
-    public ResponseEntity<ApiResponse<?>> registerTeacher(
-        @Valid @RequestBody RegisterTeacherRequest request
-    ){
-        authService.registerTeacher(request);
-        return ResponseEntity.ok(new ApiResponse<>("Tạo tài khoản cho giáo viên thành công"));
     }
 
 }

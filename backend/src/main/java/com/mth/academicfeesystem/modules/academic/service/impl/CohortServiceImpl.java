@@ -3,7 +3,9 @@ package com.mth.academicfeesystem.modules.academic.service.impl;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.mth.academicfeesystem.common.exception.DuplicateResourceException;
 import com.mth.academicfeesystem.modules.academic.dto.response.CohortResponse;
@@ -22,17 +24,21 @@ public class CohortServiceImpl implements CohortService {
 
     @Override
     public List<CohortResponse> getAllCohorts() {
-        return cohortMapper.toResponseList(cohortRepo.findAll());
+        return cohortMapper.toResponseList(cohortRepo.findAll(Sort.by(Sort.Direction.DESC, "id")));
     }
 
+    @Transactional 
     @Override
     public CohortResponse addCohort() {
-        Cohort cohort = new Cohort();
-        LocalDate currentDate = LocalDate.now();
-        cohort.setName(String.valueOf(currentDate.getYear()));
-        if (cohortRepo.existsByName(cohort.getName())) {
-            throw new DuplicateResourceException("Cohort already exists");
+        int currentYear = LocalDate.now().getYear();
+        String cohortName = "K" + currentYear;
+        if (cohortRepo.existsByName(cohortName)) {
+            throw new DuplicateResourceException("Khóa học " + cohortName + " đã tồn tại trong hệ thống");
         }
+        Cohort cohort = Cohort.builder()
+                .name(cohortName)
+                .admissionYear(currentYear)
+                .build();
         Cohort cohortSaved = cohortRepo.save(cohort);
         return cohortMapper.toResponse(cohortSaved);
     }

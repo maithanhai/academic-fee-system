@@ -1,5 +1,11 @@
 package com.mth.academicfeesystem.modules.notification.dto.request;
 
-public class NotificationRequest {
+import lombok.Builder;
 
-}
+@Builder
+public record NotificationRequest(
+    String title,
+    String content,
+    Boolean active
+) {
+} 

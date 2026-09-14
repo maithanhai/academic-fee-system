@@ -17,17 +17,17 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api")
-@PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 public class CohortController {
     private final CohortService cohortService;
     @PostMapping("/admin/cohorts")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<CohortResponse>> addCohort(){
         CohortResponse response = cohortService.addCohort();
         return ResponseEntity.ok(new ApiResponse<>("Thêm khóa học mới thành công",response));
     }
 
-    @GetMapping("/admin/cohorts")
+    @GetMapping("/cohorts")
     public ResponseEntity<ApiResponse<List<CohortResponse>>> getAllCohorts(){
         List<CohortResponse> response = cohortService.getAllCohorts();
         return ResponseEntity.ok(new ApiResponse<>("Lấy danh sách khóa học thành công",response));

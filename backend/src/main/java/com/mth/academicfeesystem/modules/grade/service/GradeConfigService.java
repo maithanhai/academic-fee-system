@@ -1,12 +1,13 @@
 package com.mth.academicfeesystem.modules.grade.service;
 
-import java.util.List;
-
-import com.mth.academicfeesystem.modules.grade.dto.request.GradeConfigRequest;
-import com.mth.academicfeesystem.modules.grade.dto.response.SubjectGradeConfigResponse;
+import com.mth.academicfeesystem.modules.grade.dto.request.GradeConfigsRequest;
+import com.mth.academicfeesystem.modules.grade.dto.request.UpdateGradeConfigsRequest;
+import com.mth.academicfeesystem.modules.grade.dto.response.GradeConfigsResponse;
 
 public interface GradeConfigService {
-    void createConfig(GradeConfigRequest request);
-    void updateConfig(Long configId, GradeConfigRequest request);
-    List<SubjectGradeConfigResponse> getAllConfigsGroupedBySubject();
+    GradeConfigsResponse createGradeConfigs(GradeConfigsRequest request);
+
+    GradeConfigsResponse updateGradeConfigs(UpdateGradeConfigsRequest request);
+
+    GradeConfigsResponse getGradeConfigsBySubjectId(Long subjectId);
 }

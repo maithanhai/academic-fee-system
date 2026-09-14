@@ -2,12 +2,11 @@ package com.mth.academicfeesystem.modules.academic.service.impl;
 
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.mth.academicfeesystem.common.exception.BusinessException;
 import com.mth.academicfeesystem.common.exception.DuplicateResourceException;
 import com.mth.academicfeesystem.common.exception.ResourceNotFoundException;
-import com.mth.academicfeesystem.modules.academic.dto.request.SubjectActiveRequest;
 import com.mth.academicfeesystem.modules.academic.dto.request.SubjectRequest;
 import com.mth.academicfeesystem.modules.academic.dto.response.SubjectResponse;
 import com.mth.academicfeesystem.modules.academic.entity.Subject;
@@ -25,40 +24,36 @@ public class SubjectServiceImpl implements SubjectService {
 
     @Override
     public List<SubjectResponse> getAllSubjects(){
-        return subjectMapper.toResponseList(subjectRepo.findAll());
+        return subjectMapper.toResponseList(subjectRepo.findAll(Sort.by(Sort.Direction.DESC, "id")));
     }
     @Transactional
     @Override
-    public void addSubject(SubjectRequest request){
+    public SubjectResponse addSubject(SubjectRequest request){
         Subject subject = new Subject();
         subjectMapper.toEntity(request, subject);
-        if (subjectRepo.existsByName(subject.getName())){
-            throw new DuplicateResourceException("Subject with name " + subject.getName() + " already exists!");
+        if (subjectRepo.findByName(subject.getName()) != null){
+            throw new DuplicateResourceException("Môn học " + subject.getName() + " đã tồn tại trong hệ thống");
         }
-        subjectRepo.save(subject);
+        return subjectMapper.toResponse(subjectRepo.save(subject));
     }
+
 
     @Transactional
     @Override
-    public void changeActiveSubject(Long subjectId, SubjectActiveRequest request){
-        Subject subject = subjectRepo.findById(subjectId)
-            .orElseThrow(()-> new ResourceNotFoundException("Subject not found"));
-        if (subject.getActive().equals(request.active()))
-            throw new BusinessException("Subject can not change active");
-        subject.setActive(request.active());
-        subjectRepo.save(subject);
-    }
-
-    @Transactional
-    @Override
-    public SubjectResponse updateSubject(Long subjectId, SubjectRequest request){
-        Subject subject = subjectRepo.findById(subjectId)
-            .orElseThrow(()->new ResourceNotFoundException("Subject with id " + subjectId + " not found"));
+    public SubjectResponse updateSubject(Long id, SubjectRequest request){
+        Subject subject = subjectRepo.findById(id)
+            .orElseThrow(()->new ResourceNotFoundException("Môn học không tồn tại"));
         subjectMapper.toEntity(request, subject);
-        if (subjectRepo.existsByName(subject.getName())){
-            throw new DuplicateResourceException("Subject with name " + subject.getName() + " already exists!");
+        Subject existingSubject = subjectRepo.findByName(subject.getName());
+        if (existingSubject != null && !existingSubject.getId().equals(id)) {
+            throw new DuplicateResourceException("Môn học " + subject.getName() + " đã tồn tại trong hệ thống");
         }
-        subjectRepo.save(subject);
-        return subjectMapper.toResponse(subject);
+        return subjectMapper.toResponse(subjectRepo.save(subject));
+    }
+
+    @Override
+    public List<SubjectResponse> getActiveSubjects() {
+        List<Subject> activeSubjects = subjectRepo.findByActiveTrue();
+        return subjectMapper.toResponseList(activeSubjects);
     }
 }

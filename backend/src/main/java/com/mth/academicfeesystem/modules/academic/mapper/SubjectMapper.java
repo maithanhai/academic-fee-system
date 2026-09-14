@@ -16,8 +16,8 @@ public interface SubjectMapper {
     SubjectResponse toResponse(Subject subject);
     
     @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "active", ignore = true)
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "active", source = "active")
     Subject toEntity(SubjectRequest request, @MappingTarget Subject subject);
 
     List<SubjectResponse> toResponseList(List<Subject> subjects);

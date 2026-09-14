@@ -1,5 +1,6 @@
 package com.mth.academicfeesystem.modules.notification.service;
 
-public class EmailService {
-
-}
+public interface EmailService {
+    void sendHtmlEmail(String to, String subject, String htmlContent);
+    
+} 

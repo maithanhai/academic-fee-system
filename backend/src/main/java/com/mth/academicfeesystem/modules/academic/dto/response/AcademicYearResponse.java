@@ -2,5 +2,6 @@ package com.mth.academicfeesystem.modules.academic.dto.response;
 
 public record AcademicYearResponse (
     Long id,
-    String name
+    String name,
+    Boolean active
 ) {} 

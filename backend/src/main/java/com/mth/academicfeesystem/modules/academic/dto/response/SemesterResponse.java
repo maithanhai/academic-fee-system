@@ -1,5 +1,11 @@
 package com.mth.academicfeesystem.modules.academic.dto.response;
 
-public class SemesterResponse {
+import com.mth.academicfeesystem.common.enums.SemesterName;
 
-}
+import lombok.Builder;
+@Builder
+public record SemesterResponse(
+    Long id, 
+    SemesterName name
+) {
+} 

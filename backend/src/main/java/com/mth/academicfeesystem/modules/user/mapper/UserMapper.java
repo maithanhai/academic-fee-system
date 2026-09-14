@@ -13,8 +13,6 @@ import com.mth.academicfeesystem.modules.people.entity.Student;
 import com.mth.academicfeesystem.modules.people.entity.Teacher;
 import com.mth.academicfeesystem.modules.people.mapper.StudentMapper;
 import com.mth.academicfeesystem.modules.people.mapper.TeacherMapper;
-import com.mth.academicfeesystem.modules.user.dto.request.RegisterStudentRequest;
-import com.mth.academicfeesystem.modules.user.dto.request.RegisterTeacherRequest;
 import com.mth.academicfeesystem.modules.user.dto.response.MyProfileResponse;
 import com.mth.academicfeesystem.modules.user.entity.User;
 
@@ -29,20 +27,6 @@ public interface UserMapper {
     @Mapping(source = "student",target = "studentDetailResponse")
     @Mapping(source="teacher",target = "teacherDetailResponse")
     MyProfileResponse toResponse(User user, Student student, Teacher teacher);
-    
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "fullName",source = "fullName")
-    @Mapping(target="gender",source = "gender")
-    @Mapping(target = "dateOfBirth",source="dateOfBirth")
-    void registerStudentToUser(RegisterStudentRequest request,@MappingTarget User user);
-
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "fullName",source = "fullName")
-    @Mapping(target = "gender",source = "gender")
-    @Mapping(target = "dateOfBirth",source = "dateOfBirth")
-    @Mapping(target = "phone",source = "phone")
-    @Mapping(target = "email", source = "email")
-    void registerTeacherToUser(RegisterTeacherRequest request,@MappingTarget User user);
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target="fullName", source = "fullName")

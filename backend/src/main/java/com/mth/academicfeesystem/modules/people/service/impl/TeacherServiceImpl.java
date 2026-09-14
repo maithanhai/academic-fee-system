@@ -1,14 +1,20 @@
 package com.mth.academicfeesystem.modules.people.service.impl;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.mth.academicfeesystem.common.enums.Role;
+import com.mth.academicfeesystem.common.exception.BusinessException;
 import com.mth.academicfeesystem.common.exception.ResourceNotFoundException;
 import com.mth.academicfeesystem.common.response.PageResponse;
 import com.mth.academicfeesystem.modules.academic.entity.Subject;
@@ -17,6 +23,7 @@ import com.mth.academicfeesystem.modules.people.dto.request.TeacherSearchRequest
 import com.mth.academicfeesystem.modules.people.dto.request.TeacherAdminUpdateRequest;
 import com.mth.academicfeesystem.modules.people.dto.response.TeacherDetailResponse;
 import com.mth.academicfeesystem.modules.people.dto.response.TeacherListResponse;
+import com.mth.academicfeesystem.modules.people.dto.response.TeacherResponse;
 import com.mth.academicfeesystem.modules.people.entity.Department;
 import com.mth.academicfeesystem.modules.people.entity.Teacher;
 import com.mth.academicfeesystem.modules.people.entity.TeacherExpertise;
@@ -25,6 +32,7 @@ import com.mth.academicfeesystem.modules.people.repository.DepartmentRepository;
 import com.mth.academicfeesystem.modules.people.repository.TeacherExpertiseRepository;
 import com.mth.academicfeesystem.modules.people.repository.TeacherRepository;
 import com.mth.academicfeesystem.modules.people.service.TeacherService;
+import com.mth.academicfeesystem.modules.user.dto.request.RegisterTeacherRequest;
 import com.mth.academicfeesystem.modules.user.entity.User;
 import com.mth.academicfeesystem.modules.user.mapper.UserMapper;
 import com.mth.academicfeesystem.modules.user.repository.UserRepository;
@@ -42,6 +50,16 @@ public class TeacherServiceImpl implements TeacherService {
     private final UserMapper userMapper;
     private final DepartmentRepository departmentRepo;
     private final SubjectRepository subjectRepo;
+    private final PasswordEncoder passwordEncoder;
+    private final TeacherExpertiseRepository teacherExpertiseRepo;
+
+    @Override
+    public List<TeacherResponse> getActiveTeachers() {
+        List<Teacher> teachers = teacherRepo.findActiveTeacher();
+        if (teachers.isEmpty())
+            throw new BusinessException("Không tồn tại giáo viên với trạng thái hoạt động");
+        return teacherMapper.toListResponses(teachers);
+    }
 
     @Override
     public PageResponse<TeacherListResponse> searchTeachers(TeacherSearchRequest request, Pageable pageable) {
@@ -66,25 +84,26 @@ public class TeacherServiceImpl implements TeacherService {
             if (request.getActive() != null) {
                 predicates.add(cb.equal(userJoin.get("active"), request.getActive()));
             }
-
             return cb.and(predicates.toArray(new Predicate[0]));
         };
-
-        Page<Teacher> teacherPage = teacherRepo.findAll(spec, pageable);
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by("id").descending());
+        Page<Teacher> teacherPage = teacherRepo.findAll(spec, sortedPageable);
         return teacherMapper.toPageResponse(teacherPage);
     }
 
     @Override
     public TeacherDetailResponse getTeacherById(Long id) {
         Teacher teacher = teacherRepo.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Teacher not found"));
+                () -> new ResourceNotFoundException("Giáo viên không tồn tại"));
         return teacherMapper.toDetailResponse(teacher);
     }
 
     @Transactional
     @Override
     public TeacherDetailResponse updateTeacher(Long userId, TeacherAdminUpdateRequest request) {
-        System.out.println("DATA từ request: " + request);
         Teacher teacher = teacherRepo.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Teacher not found"));
         User user = teacher.getUser();
@@ -117,6 +136,53 @@ public class TeacherServiceImpl implements TeacherService {
                 }
             }
         }
+        return teacherMapper.toDetailResponse(teacher);
+    }
+
+    @Transactional
+    @Override
+    public TeacherDetailResponse registerTeacher(RegisterTeacherRequest request) {
+        long currentTeacherCount = teacherRepo.count();
+        String[] nameParts = request.fullName().trim().split("\\s+");
+        StringBuilder firstLetterBuilder = new StringBuilder();
+        for (String part : nameParts) {
+            firstLetterBuilder.append(part.charAt(0));
+        }
+        String firstLetter = firstLetterBuilder.toString().toLowerCase();
+        User user = User.builder()
+                .fullName(request.fullName())
+                .gender(request.gender())
+                .dateOfBirth(request.dateOfBirth())
+                .phone(request.phone())
+                .email(request.email())
+                .username("gv" + String.format("%03d", currentTeacherCount + 1) + firstLetter)
+                .password(passwordEncoder.encode(request.dateOfBirth().format(DateTimeFormatter.ofPattern("ddMMyyyy"))))
+                .role(Role.ROLE_TEACHER)
+                .build();
+        userRepo.save(user);
+
+        Department department = departmentRepo.findById(request.departmentId())
+                .orElseThrow(() -> new ResourceNotFoundException("Tổ bộ môn không tồn tại"));
+
+        Teacher teacher = Teacher.builder()
+                .department(department)
+                .user(user)
+                .build();
+        teacherRepo.save(teacher);
+
+        List<TeacherExpertise> expertisesToSave = new ArrayList<>();
+        for (Long subjectId : request.subjectIds()) {
+            Subject subject = subjectRepo.findById(subjectId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Môn học không tồn tại với ID: " + subjectId));
+
+            TeacherExpertise expertise = TeacherExpertise.builder()
+                    .teacher(teacher)
+                    .subject(subject)
+                    .build();
+
+            expertisesToSave.add(expertise);
+        }
+        teacherExpertiseRepo.saveAll(expertisesToSave);
         return teacherMapper.toDetailResponse(teacher);
     }
 }

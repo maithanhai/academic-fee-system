@@ -1,7 +1,10 @@
 package com.mth.academicfeesystem.modules.audit.aspect;
 
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -10,33 +13,44 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mth.academicfeesystem.modules.audit.annotation.Auditable;
 import com.mth.academicfeesystem.modules.audit.service.AuditLogService;
 import com.mth.academicfeesystem.security.CustomUserPrincipal;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Aspect
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class AuditAspect {
-
     private final AuditLogService auditLogService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper=new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);;
 
-    @AfterReturning(value = "@annotation(auditable)", returning = "result")
-    public void logAction(JoinPoint joinPoint, Auditable auditable, Object result) {
+    @Around("@annotation(auditable)")
+    public Object logAction(ProceedingJoinPoint joinPoint, Auditable auditable) throws Throwable {
         try {
-            Long userId = getCurrentUserId();
-            String payload = toJson(joinPoint.getArgs());
-            String ipAddress = getClientIp();
-
-            auditLogService.save(userId, auditable.action(), auditable.targetTable(), payload, ipAddress);
-        } catch (Exception e) {
-            log.error("Lỗi khi ghi Audit Log: {}", e.getMessage());
+            Object result = joinPoint.proceed();
+            Object beforeData = AuditContext.getBefore();
+            if (beforeData == null && auditable.action().contains("UPDATE")) {
+                return result;
+            }
+            Map<String, Object> payloadMap = new LinkedHashMap<>();
+            payloadMap.put("before", beforeData);
+            payloadMap.put("after", result != null ? result : AuditContext.getAfter());
+            auditLogService.save(
+                    getCurrentUserId(),
+                    auditable.action(),
+                    auditable.targetTable(),
+                    toJson(payloadMap),
+                    getClientIp());
+            return result;
+        } finally {
+            AuditContext.clear();
         }
     }
 
@@ -48,9 +62,9 @@ public class AuditAspect {
         return null;
     }
 
-    private String toJson(Object[] args) {
+    private String toJson(Object obj) {
         try {
-            return objectMapper.writeValueAsString(args);
+            return objectMapper.writeValueAsString(obj);
         } catch (Exception e) {
             return "{}";
         }
@@ -58,7 +72,8 @@ public class AuditAspect {
 
     private String getClientIp() {
         ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attrs == null) return null;
+        if (attrs == null)
+            return null;
         HttpServletRequest request = attrs.getRequest();
         return request.getRemoteAddr();
     }

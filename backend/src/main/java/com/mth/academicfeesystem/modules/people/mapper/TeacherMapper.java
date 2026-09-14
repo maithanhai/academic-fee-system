@@ -14,6 +14,7 @@ import com.mth.academicfeesystem.common.response.PageResponse;
 import com.mth.academicfeesystem.modules.academic.dto.response.SubjectResponse;
 import com.mth.academicfeesystem.modules.people.dto.response.TeacherDetailResponse;
 import com.mth.academicfeesystem.modules.people.dto.response.TeacherListResponse;
+import com.mth.academicfeesystem.modules.people.dto.response.TeacherResponse;
 import com.mth.academicfeesystem.modules.people.entity.Teacher;
 import com.mth.academicfeesystem.modules.people.entity.TeacherExpertise;
 import com.mth.academicfeesystem.modules.user.dto.request.RegisterTeacherRequest;
@@ -53,14 +54,14 @@ public interface TeacherMapper {
     @Mapping(target = "fullName",source = "user.fullName")
     @Mapping(target = "active",source = "user.active")
     @Mapping(target = "department",source = "department")
-    TeacherListResponse toResponse(Teacher teacher);
+    TeacherListResponse toListResponse(Teacher teacher);
     default PageResponse<TeacherListResponse> toPageResponse(Page<Teacher> page) {
         if (page == null) {
             return null;
         }
         List<TeacherListResponse> content = page.getContent()
                 .stream()
-                .map(this::toResponse) 
+                .map(this::toListResponse) 
                 .toList();
         return PageResponse.<TeacherListResponse>builder()
                 .currentPage(page.getNumber() + 1)
@@ -73,4 +74,8 @@ public interface TeacherMapper {
 
     @BeanMapping(ignoreByDefault = true)
     void registerToTeacher(RegisterTeacherRequest request,@MappingTarget Teacher teacher);
+
+    @Mapping(target = "teacherName", source = "user.fullName")
+    TeacherResponse toResponse(Teacher teacher);
+    List<TeacherResponse> toListResponses(List<Teacher> teachers);
 }
