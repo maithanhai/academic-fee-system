@@ -73,8 +73,6 @@ DB_PASSWORD=your_mysql_password
 JWT_SECRET=your_secret_key_at_least_256_bits
 MAIL_USERNAME=
 MAIL_PASSWORD=
-VNPAY_TMN_CODE=your_vnpay_code
-VNPAY_HASH_SECRET=your_vnpay_hash_secret
 ```
 
 Trong giai đoạn phát triển, Hibernate đang dùng `ddl-auto: update` để cập nhật bảng từ entity. Không dùng mật khẩu mặc định khi chạy môi trường thật.
@@ -117,7 +115,7 @@ npm run preview
 
 ### 4. Mail local
 
-Backend hiện cấu hình SMTP local ở `localhost:1025`. Khi cần kiểm thử email, chạy một SMTP testing server tương thích, chẳng hạn MailHog/Mailpit, hoặc thay các giá trị `spring.mail` trong cấu hình bằng SMTP thật.
+Backend hiện cấu hình SMTP local ở `localhost:1025`, đây là cổng SMTP của MailDev để ứng dụng gửi email. Giao diện web MailDev thường chạy ở `http://localhost:1080` để xem email. Khi cần kiểm thử email, chạy MailDev hoặc một SMTP testing server tương thích; nếu dùng cổng khác, thay các giá trị `spring.mail` trong cấu hình.
 
 ### 5. Kiểm tra build
 
