@@ -49,14 +49,6 @@ public class HomeroomAssignmentController {
         return ResponseEntity.ok(new ApiResponse<>("Kết thúc giáo viên chủ nhiệm thành công"));
     }
 
-    // @GetMapping("/secure/my-homeroom-class")
-    // @PreAuthorize("@assignmentGuard.isHomeroomTeacher(principal.id, #classId)")
-    // public ResponseEntity<ApiResponse<HomeroomAssignmentResponse>> getMyHomeroomClass(
-    //         @AuthenticationPrincipal CustomUserPrincipal principal) {
-    //     HomeroomAssignmentResponse response = homeroomAssignmentService.getMyHomeroomClass(principal.getId());
-    //     return ResponseEntity.ok(new ApiResponse<>("Lấy thông tin lớp chủ nhiệm thành công", response));
-    // }
-
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/homeroom-assignments")
     public ResponseEntity<ApiResponse<List<HomeroomAssignmentResponse>>> getAssignments(

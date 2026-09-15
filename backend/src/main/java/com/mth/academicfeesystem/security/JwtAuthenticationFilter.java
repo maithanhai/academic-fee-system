@@ -20,15 +20,16 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class JwtAuthenticationFilter extends OncePerRequestFilter{
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsService userDetailsService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
             String token = extractToken(request);
-            if (token != null && jwtTokenProvider.validateToken(token)) {
+            if (token != null && jwtTokenProvider.validateToken(token) && !jwtTokenProvider.isRefreshToken(token)) {
                 String username = jwtTokenProvider.getUsernameFromToken(token);
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -41,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
                 }
             }
         } catch (Exception ex) {
-            log.error("Unable to authenticate user: ",ex.getMessage());
+            log.error("Không thể xác thực người dùng (Authentication error): {}", ex.getMessage(), ex);
             SecurityContextHolder.clearContext();
         }
         filterChain.doFilter(request, response);

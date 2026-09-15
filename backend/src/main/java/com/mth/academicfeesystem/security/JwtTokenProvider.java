@@ -73,4 +73,14 @@ public class JwtTokenProvider {
                 .parseSignedClaims(token).getPayload();
         return claims.get("userId", Long.class);
     }
+
+    public boolean isRefreshToken(String token) {
+        try {
+            Claims claims = Jwts.parser().verifyWith(getSigningKey()).build()
+                    .parseSignedClaims(token).getPayload();
+            return "refresh".equals(claims.get("type"));
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

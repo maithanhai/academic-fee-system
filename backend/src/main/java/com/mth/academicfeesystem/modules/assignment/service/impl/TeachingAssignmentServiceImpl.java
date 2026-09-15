@@ -43,7 +43,6 @@ public class TeachingAssignmentServiceImpl implements TeachingAssignmentService 
     public List<TeachingAssignmentResponse> getExistingAssignments(Long academicYearId, List<Integer> gradeLevels) {
         if (gradeLevels == null || gradeLevels.isEmpty())
             throw new BusinessException("Danh sách khối lớp không để trống");
-
         boolean hasInvalidGrade = gradeLevels.stream().anyMatch(gl -> gl < 10 || gl > 12);
         if (hasInvalidGrade) {
             throw new BusinessException("Khối lớp không hợp lệ, chỉ áp dụng cho khối 10, 11 , 12");
@@ -53,10 +52,8 @@ public class TeachingAssignmentServiceImpl implements TeachingAssignmentService 
         for (Object[] row : dbWorkloads) {
             teacherWorkload.put((Long) row[0], (Long) row[1]);
         }
-
         List<TeachingAssignment> existingAssignments = teachingAssignmentRepo
                 .findByAcademicYearAndGradeLevels(academicYearId, gradeLevels);
-
         return existingAssignments.stream().map(assignment -> {
             Long teacherId = assignment.getTeacher().getId();
             return TeachingAssignmentResponse.builder()
@@ -84,32 +81,26 @@ public class TeachingAssignmentServiceImpl implements TeachingAssignmentService 
         if (hasInvalidGrade) {
             throw new BusinessException("Khối lớp không hợp lệ, chỉ áp dụng cho khối 10, 11 , 12");
         }
-
         AcademicYear previousYear = academicYearRepo.findById(academicYear.getId() - 1)
                 .orElseThrow(() -> new BusinessException("Dữ liệu năm học trước không tồn tại"));
 
         List<TeachingAssignment> oldAssignments = teachingAssignmentRepo
                 .findByAcademicYearAndGradeLevels(previousYear.getId(), gradeLevels);
-
         if (oldAssignments.isEmpty()) {
             throw new BusinessException("Dữ liệu phân công năm trước không tồn tại");
         }
-
         List<SchoolClass> currentClasses = classRepo.findByAcademicYearIdAndGradeLevelIn(academicYearId, gradeLevels);
         Map<String, Long> currentClassMapByName = currentClasses.stream()
                 .collect(Collectors.toMap(SchoolClass::getName, SchoolClass::getId));
-
         Map<Long, Long> teacherWorkload = new HashMap<>();
         List<Object[]> dbWorkloads = teachingAssignmentRepo.countTeacherWorkloadByAcademicYear(academicYearId);
         for (Object[] row : dbWorkloads) {
             teacherWorkload.put((Long) row[0], (Long) row[1]);
         }
-
         List<TeachingAssignmentResponse> result = new ArrayList<>();
         for (TeachingAssignment oldAssign : oldAssignments) {
             String className = oldAssign.getSchoolClass().getName();
             Long newClassId = currentClassMapByName.get(className);
-
             if (newClassId != null) {
                 Long teacherId = oldAssign.getTeacher().getId();
                 result.add(TeachingAssignmentResponse.builder()
@@ -132,7 +123,6 @@ public class TeachingAssignmentServiceImpl implements TeachingAssignmentService 
             throw new BusinessException("Năm học đã đóng");
         if (gradeLevels == null || gradeLevels.isEmpty())
             throw new BusinessException("Danh sách khối lớp không để trống");
-
         boolean hasInvalidGrade = gradeLevels.stream().anyMatch(gl -> gl < 10 || gl > 12);
         if (hasInvalidGrade) {
             throw new BusinessException("Khối lớp không hợp lệ, chỉ áp dụng cho khối 10, 11 , 12");
@@ -170,7 +160,6 @@ public class TeachingAssignmentServiceImpl implements TeachingAssignmentService 
             for (SchoolClass schoolClass : schoolClasses) {
                 Teacher selectedTeacher = availableTeachers.get(0);
                 long minWorkload = Long.MAX_VALUE;
-
                 for (Teacher teacher : availableTeachers) {
                     long currentWorkload = teacherWorkload.getOrDefault(teacher.getId(), 0L);
                     if (currentWorkload < minWorkload) {
@@ -178,16 +167,15 @@ public class TeachingAssignmentServiceImpl implements TeachingAssignmentService 
                         selectedTeacher = teacher;
                     }
                 }
-                long updateWorkload = minWorkload++;
+                long newWorkload = minWorkload + 1;
                 previewList.add(TeachingAssignmentResponse.builder()
                         .classId(schoolClass.getId())
                         .subjectId(subject.getId())
                         .teacherId(selectedTeacher.getId())
                         .teacherName(selectedTeacher.getUser().getFullName())
-                        .workload(updateWorkload)
+                        .workload(newWorkload)
                         .build());
-
-                teacherWorkload.put(selectedTeacher.getId(), minWorkload + 1);
+                teacherWorkload.put(selectedTeacher.getId(), newWorkload);
             }
         }
         return previewList;
@@ -229,11 +217,9 @@ public class TeachingAssignmentServiceImpl implements TeachingAssignmentService 
                 .collect(Collectors.toMap(s -> s.getId(), s -> s));
         Map<Long, Teacher> teacherMap = teacherRepo.findAllById(teacherIds).stream()
                 .collect(Collectors.toMap(t -> t.getId(), t -> t));
-
         List<TeachingAssignment> existingAssignments = teachingAssignmentRepo.findBySchoolClassIdIn(classIds);
         Map<String, TeachingAssignment> existingMap = existingAssignments.stream()
                 .collect(Collectors.toMap(a -> a.getSchoolClass().getId() + "_" + a.getSubject().getId(), a -> a));
-
         List<TeachingAssignment> assignmentsToSave = new ArrayList<>();
         List<TeachingAssignment> assignmentsToDelete = new ArrayList<>();
 
@@ -248,15 +234,12 @@ public class TeachingAssignmentServiceImpl implements TeachingAssignmentService 
                 }
                 continue;
             }
-
             SchoolClass schoolClass = classMap.get(item.classId());
             Subject subject = subjectMap.get(item.subjectId());
             Teacher teacher = teacherMap.get(item.teacherId());
-
             if (schoolClass == null || subject == null || teacher == null) {
                 throw new ResourceNotFoundException("Dữ liệu Lớp,Môn,GV không tồn tại");
             }
-
             if (existing != null) {
                 // cập nhật
                 if (!existing.getTeacher().getId().equals(teacher.getId())) {

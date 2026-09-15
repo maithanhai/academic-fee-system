@@ -83,8 +83,9 @@ public class AcademicYearServiceImpl implements AcademicYearService {
             return academicYearMapper.toResponse(academicYear);
         academicYear.setActive(request.active());
         academicYearRepo.save(academicYear);
-        if (!academicYear.getActive()) 
+        if (!academicYear.getActive()) {
             classEnrollmentService.dropEnrollmentsByAcademicYearId(academicYearId);
+        }
         return academicYearMapper.toResponse(academicYear);
     }
 

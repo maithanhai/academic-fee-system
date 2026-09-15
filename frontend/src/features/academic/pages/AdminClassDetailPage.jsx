@@ -6,6 +6,7 @@ import EnrollStudentModal from '../components/EnrollStudentModel';
 import TransferClassModal from '../components/TransferClassModal';
 import StudentTranscriptModal from '../../grade/components/StudentTranscriptModal';
 import gradeApi from '../../grade/api/gradeApi';
+import {toDisplayDate} from "../../../shared/utils/dateUtils"
 
 const { Title } = Typography;
 
@@ -41,7 +42,6 @@ const AdminClassDetailPage = () => {
     }
   }, [classId, fetchStudents]);
 
-  // Sắp xếp học sinh theo TÊN tiếng Việt (A-Z)
   const sortedStudents = useMemo(() => {
     return [...students].sort((a, b) => {
       const getFirstName = (fullName) => {
@@ -93,7 +93,8 @@ const AdminClassDetailPage = () => {
     { 
       title: 'Ngày sinh', 
       dataIndex: 'dayOfBirth', 
-      key: 'dayOfBirth' 
+      key: 'dayOfBirth',
+      render: (val) => toDisplayDate(val)
     },
     {
       title: 'Thao tác',

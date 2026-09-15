@@ -2,7 +2,6 @@ package com.mth.academicfeesystem.modules.assignment.service;
 
 import org.springframework.stereotype.Component;
 
-import com.mth.academicfeesystem.common.enums.AssignmentStatus;
 import com.mth.academicfeesystem.modules.assignment.repository.HomeroomAssignmentRepository;
 import com.mth.academicfeesystem.modules.assignment.repository.TeachingAssignmentRepository;
 
@@ -17,7 +16,7 @@ public class AssignmentGuard {
 
     //GVCN
     public boolean isHomeroomTeacher(Long teacherId, Long classId) {
-        return homeroomAssignmentRepo.existsByTeacherIdAndSchoolClassIdAndStatus(teacherId, classId, AssignmentStatus.ACTIVE);
+        return homeroomAssignmentRepo.existsByTeacherIdAndSchoolClassId(teacherId, classId);
     }
 
     //GVBM(nhập điểm, xem điểm)

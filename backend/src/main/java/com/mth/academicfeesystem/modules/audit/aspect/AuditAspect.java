@@ -27,21 +27,18 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuditAspect {
     private final AuditLogService auditLogService;
-    private final ObjectMapper objectMapper=new ObjectMapper()
+    private final ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);;
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     @Around("@annotation(auditable)")
     public Object logAction(ProceedingJoinPoint joinPoint, Auditable auditable) throws Throwable {
+        Object beforeData = AuditContext.getBefore();
         try {
             Object result = joinPoint.proceed();
-            Object beforeData = AuditContext.getBefore();
-            if (beforeData == null && auditable.action().contains("UPDATE")) {
-                return result;
-            }
             Map<String, Object> payloadMap = new LinkedHashMap<>();
             payloadMap.put("before", beforeData);
-            payloadMap.put("after", result != null ? result : AuditContext.getAfter());
+            payloadMap.put("after", result);
             auditLogService.save(
                     getCurrentUserId(),
                     auditable.action(),
@@ -49,6 +46,17 @@ public class AuditAspect {
                     toJson(payloadMap),
                     getClientIp());
             return result;
+        } catch (Exception ex) {
+            Map<String, Object> payloadMap = new LinkedHashMap<>();
+            payloadMap.put("before", beforeData);
+            payloadMap.put("error", ex.getMessage());
+            auditLogService.save(
+                    getCurrentUserId(),
+                    auditable.action(),
+                    auditable.targetTable(),
+                    toJson(payloadMap),
+                    getClientIp());
+            throw ex;
         } finally {
             AuditContext.clear();
         }

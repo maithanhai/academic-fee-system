@@ -48,7 +48,6 @@ public class HomeroomAssignmentServiceImpl implements HomeroomAssignmentService 
                 List<HomeroomAssignmentRequest> assignments = request.assignments();
                 if (assignments == null || assignments.isEmpty())
                         return;
-
                 AcademicYear academicYear = academicYearRepo.findById(academicYearId)
                                 .orElseThrow(() -> new ResourceNotFoundException("Năm học không tồn tại"));
                 if (!academicYear.getActive()) {
@@ -71,7 +70,6 @@ public class HomeroomAssignmentServiceImpl implements HomeroomAssignmentService 
                                 .collect(Collectors.toMap(a -> a.getTeacher().getId(), a -> a));
 
                 List<HomeroomAssignment> assignmentsToSave = new ArrayList<>();
-
                 for (HomeroomAssignmentRequest item : assignments) {
                         SchoolClass schoolClass = classMap.get(item.classId());
                         if (schoolClass == null)
@@ -118,7 +116,7 @@ public class HomeroomAssignmentServiceImpl implements HomeroomAssignmentService 
                         assignmentsToSave.add(newAssignment);
                 }
                 if (!assignmentsToSave.isEmpty()) {
-                        homeroomAssignmentRepo.saveAll(assignmentsToSave); // <--- BULK INSERT/UPDATE
+                        homeroomAssignmentRepo.saveAll(assignmentsToSave);
                 }
         }
 
@@ -130,35 +128,10 @@ public class HomeroomAssignmentServiceImpl implements HomeroomAssignmentService 
                                                 "Không tìm thấy giáo phân công chủ nhiệm"));
                 if (homeroomAssignment.getStatus() != AssignmentStatus.ACTIVE)
                         throw new BusinessException("Đã kết thúc phân công chủ nhiệm rồi");
-
                 homeroomAssignment.setStatus(AssignmentStatus.ENDED);
                 homeroomAssignment.setEndDate(LocalDate.now());
-
                 homeroomAssignmentRepo.save(homeroomAssignment);
         }
-
-        // @Transactional
-        // @Override
-        // public HomeroomAssignmentResponse getMyHomeroomClass(Long userId) {
-        // Teacher teacher = teacherRepo.findById(userId)
-        // .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy giáo
-        // viên"));
-
-        // HomeroomAssignment assignment = homeroomAssignmentRepo
-        // .findByTeacherIdAndStatus(teacher.getId(), AssignmentStatus.ACTIVE)
-        // .orElseThrow(() -> new BusinessException(
-        // "Giáo viên này hiện đang không chủ nhiệm lớp nào"));
-
-        // return HomeroomAssignmentResponse.builder()
-        // .id(assignment.getId())
-        // .classId(assignment.getSchoolClass().getId())
-        // .className(assignment.getSchoolClass().getName())
-        // .teacherId(teacher.getId())
-        // .teacherName(teacher.getUser().getFullName())
-        // .startDate(assignment.getStartDate())
-        // .status(assignment.getStatus().name())
-        // .build();
-        // }
 
         @Override
         public List<HomeroomAssignmentResponse> getExistingAssignments(Long academicYearId) {
@@ -166,7 +139,6 @@ public class HomeroomAssignmentServiceImpl implements HomeroomAssignmentService 
                                 .stream().map(SchoolClass::getId).toList();
                 if (classIds.isEmpty())
                         return new ArrayList<>();
-
                 return homeroomAssignmentRepo.findBySchoolClassIdInAndStatus(classIds, AssignmentStatus.ACTIVE)
                                 .stream()
                                 .map(assignment -> homeroomAssignmentMapper.toResponse(assignment))

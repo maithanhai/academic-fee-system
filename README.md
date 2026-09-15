@@ -1,25 +1,142 @@
-### Chức năng chính
- - Đối với Học sinh:
-    + Xem bảng điểm
-    + Theo dõi tiền chưa đóng và thực hiện thanh toán online.
-    + Nhận thông báo qua email từ nhà trường.
- - Đối với Giáo viên:
-    + Có 2 nhiệm vụ là giáo viên chủ nhiệm lớp và giáo viên bộ môn
-    + Giáo viên chủ nhiệm xác nhận thu tiền mặt và xem thống kê điểm lớp học
-    + Giáo viên bộ môn nhập điểm thành phần cho các lớp được phân công giảng dạy.
- - Đối với Admin:
-    + Tạo tài khoản, phân công giảng dạy.
-    + Tạo danh mục môn học và các đợt thu phí.
-    + Tạo thông báo tới các học sinh
-### Giải pháp kỹ thuật
- - Thanh toán online: Tích hợp cổng thanh toán VNPay 
-- Thông báo tới học sinh: Tích hợp dịch vụ SMTP để gửi Email thông báo trực tiếp đến học sinh.
-- Bảo mật và Phân quyền: Sử dụng Spring Security kết hợp JWT.
-- Minh bạch dữ liệu: Ứng dụng Spring AOP để tự động lưu lại lịch sử các thao tác nhạy cảm (Sửa điểm, Hủy thu tiền).
-- Tối ưu hiệu năng: Xử lý truy vấn N+1 Select trong JPA/Hibernate.
-- Các kỹ thuật khác: Quản lý lỗi tập trung (Global Exception Handling), tích hợp Swagger, DTO
-### Công nghệ sử dụng
-- Frontend: ReactJS
-- Backend: Java Spring Boot, Hibernate
-- Cơ sở dữ liệu: MySQL
+# Academic Fee System
 
+Academic Fee System là hệ thống quản lý học vụ và tài chính cho trường trung học phổ thông. Hệ thống quản lý người dùng, giáo viên, học sinh, năm học, lớp, phân công giáo viên, điểm số, các đợt thu học phí, hóa đơn, thông báo và lịch sử thao tác quan trọng.
+
+## Công nghệ sử dụng
+
+### Backend
+
+- Java 21
+- Spring Boot 4.1.0
+- Spring Web MVC và Spring Data JPA/Hibernate
+- Spring Security và JWT access/refresh token
+- Spring AOP cho audit log nghiệp vụ
+- MySQL
+- MapStruct, Lombok và Jakarta Bean Validation
+- Springdoc OpenAPI/Swagger
+- Apache POI cho các luồng import Excel
+- Spring Mail cho thông báo email
+
+### Frontend
+
+- React 19
+- Vite
+- React Router
+- Redux Toolkit và React Redux
+- Ant Design
+- Axios
+- Day.js
+
+## Chức năng chính
+
+### Học sinh
+
+- Đăng nhập và quản lý hồ sơ cá nhân.
+- Xem bảng điểm theo năm học.
+- Xem danh sách và chi tiết hóa đơn học phí.
+- Thanh toán hóa đơn qua luồng thanh toán được triển khai trong backend.
+- Xem thông báo của nhà trường.
+
+### Giáo viên
+
+- Giáo viên chủ nhiệm xem các lớp được phân công, danh sách học sinh và bảng điểm lịch sử của lớp.
+- Giáo viên chủ nhiệm xem hóa đơn của học sinh trong lớp, xác nhận thu tiền mặt và hoàn tác hóa đơn theo quyền assignment.
+- Giáo viên bộ môn xem lớp/môn được phân công và xem bảng điểm.
+- Giáo viên bộ môn nhập hoặc cập nhật điểm theo lớp và môn được phân công.
+
+### Admin
+
+- Quản lý tài khoản giáo viên, học sinh và tổ bộ môn.
+- Quản lý môn học, khóa học, năm học, học kỳ và lớp.
+- Xếp lớp, chuyển lớp và lên lớp tự động.
+- Phân công giáo viên chủ nhiệm và giáo viên bộ môn.
+- Cấu hình cột điểm và quản lý điểm.
+- Tạo đợt thu, phát hành hóa đơn và xử lý nghiệp vụ tài chính.
+- Tạo/gửi thông báo.
+- Xem audit log của các nghiệp vụ nhạy cảm như cập nhật điểm và xử lý hóa đơn.
+
+## Hướng dẫn cài đặt
+
+### Yêu cầu
+
+- JDK 21.
+- MySQL đang chạy ở `localhost:3306`.
+- Node.js và npm.
+- Git nếu clone project từ repository.
+
+### 1. Cấu hình backend
+
+Tạo database `academic_fee_system` hoặc để ứng dụng tự tạo database theo cấu hình hiện tại. Backend đọc cấu hình từ `backend/src/main/resources/application.yml` và có thể ghi đè bằng biến môi trường trong file `backend/.env`:
+
+```env
+DB_PASSWORD=your_mysql_password
+JWT_SECRET=your_secret_key_at_least_256_bits
+MAIL_USERNAME=
+MAIL_PASSWORD=
+VNPAY_TMN_CODE=your_vnpay_code
+VNPAY_HASH_SECRET=your_vnpay_hash_secret
+```
+
+Trong giai đoạn phát triển, Hibernate đang dùng `ddl-auto: update` để cập nhật bảng từ entity. Không dùng mật khẩu mặc định khi chạy môi trường thật.
+
+### 2. Chạy backend
+
+Windows:
+
+```powershell
+cd backend
+./mvnw.cmd spring-boot:run
+```
+
+Backend mặc định chạy tại `http://localhost:8080`.
+
+Swagger UI: `http://localhost:8080/swagger-ui.html`
+
+OpenAPI JSON: `http://localhost:8080/v3/api-docs`
+
+### 3. Chạy frontend
+
+Mở terminal khác:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend mặc định chạy tại địa chỉ Vite in trong terminal, thường là `http://localhost:5173`.
+
+Các script frontend:
+
+```powershell
+npm run dev
+npm run build
+npm run lint
+npm run preview
+```
+
+### 4. Mail local
+
+Backend hiện cấu hình SMTP local ở `localhost:1025`. Khi cần kiểm thử email, chạy một SMTP testing server tương thích, chẳng hạn MailHog/Mailpit, hoặc thay các giá trị `spring.mail` trong cấu hình bằng SMTP thật.
+
+### 5. Kiểm tra build
+
+Backend:
+
+```powershell
+cd backend
+./mvnw.cmd -DskipTests compile
+```
+
+Frontend:
+
+```powershell
+cd frontend
+npm run build
+npm run lint
+```
+
+## Tài liệu bổ sung
+
+- [API documentation](docs/api-docs.md)
+- [Database design](docs/database-design.md)
