@@ -24,7 +24,6 @@ import com.mth.academicfeesystem.modules.academic.repository.ClassEnrollmentRepo
 import com.mth.academicfeesystem.modules.academic.repository.SchoolClassRepository;
 import com.mth.academicfeesystem.modules.assignment.entity.HomeroomAssignment;
 import com.mth.academicfeesystem.modules.audit.annotation.Auditable;
-import com.mth.academicfeesystem.modules.audit.aspect.AuditContext;
 import com.mth.academicfeesystem.modules.finance.dto.request.FeeInvoiceSearchRequest;
 import com.mth.academicfeesystem.modules.finance.dto.request.InvoiceConfirmByAdminRequest;
 import com.mth.academicfeesystem.modules.finance.dto.request.InvoiceConfirmByTeacherRequest;
@@ -185,15 +184,6 @@ public class FeeInvoiceServiceImpl implements FeeInvoiceService {
         if (invoice.getStatus() == InvoiceStatus.PENDING) {
             throw new BusinessException("Hóa đơn này đang trong quá trình thanh toán");
         }
-        AuditContext.setBefore(FeeInvoiceResponse.builder()
-                .invoiceId(invoice.getId())
-                .amount(invoice.getAmount())
-                .dueDate(invoice.getFee().getDueDate())
-                .feeName(invoice.getFee().getName())
-                .paymentMethod(invoice.getPaymentMethod())
-                .status(invoice.getStatus())
-                .studentName(invoice.getStudent().getUser().getFullName())
-                .build());
         invoice.setStatus(InvoiceStatus.PAID);
         invoice.setPaymentMethod(PaymentMethod.CASH);
         invoice.setActionBy(userRepo.getReferenceById(principal.getId()));
@@ -223,15 +213,6 @@ public class FeeInvoiceServiceImpl implements FeeInvoiceService {
         if (invoice.getStatus() == InvoiceStatus.PENDING) {
             throw new BusinessException("Hóa đơn này đang trong quá trình thanh toán");
         }
-        AuditContext.setBefore(FeeInvoiceResponse.builder()
-                .invoiceId(invoice.getId())
-                .amount(invoice.getAmount())
-                .dueDate(invoice.getFee().getDueDate())
-                .feeName(invoice.getFee().getName())
-                .paymentMethod(invoice.getPaymentMethod())
-                .status(invoice.getStatus())
-                .studentName(invoice.getStudent().getUser().getFullName())
-                .build());
         invoice.setStatus(InvoiceStatus.PAID);
         invoice.setPaymentMethod(PaymentMethod.CASH);
         invoice.setActionBy(userRepo.getReferenceById(principal.getId()));
@@ -257,15 +238,6 @@ public class FeeInvoiceServiceImpl implements FeeInvoiceService {
         if (invoice.getStatus() != InvoiceStatus.PAID) {
             throw new BusinessException("Chỉ được hoàn tác hóa đơn đã thanh toán");
         }
-        AuditContext.setBefore(FeeInvoiceResponse.builder()
-                .invoiceId(invoice.getId())
-                .amount(invoice.getAmount())
-                .dueDate(invoice.getFee().getDueDate())
-                .feeName(invoice.getFee().getName())
-                .paymentMethod(invoice.getPaymentMethod())
-                .status(invoice.getStatus())
-                .studentName(invoice.getStudent().getUser().getFullName())
-                .build());
         invoice.setStatus(InvoiceStatus.UNPAID);
         invoice.setPaymentMethod(null);
         invoice.setUndoReason(request.undoReason());
@@ -301,15 +273,6 @@ public class FeeInvoiceServiceImpl implements FeeInvoiceService {
         if (invoice.getPaymentMethod() == PaymentMethod.BANK_TRANSFER) {
             throw new BusinessException("Không hủy được hóa đơn thanh toán trực tuyến");
         }
-        AuditContext.setBefore(FeeInvoiceResponse.builder()
-                .invoiceId(invoice.getId())
-                .amount(invoice.getAmount())
-                .dueDate(invoice.getFee().getDueDate())
-                .feeName(invoice.getFee().getName())
-                .paymentMethod(invoice.getPaymentMethod())
-                .status(invoice.getStatus())
-                .studentName(invoice.getStudent().getUser().getFullName())
-                .build());
         invoice.setStatus(InvoiceStatus.UNPAID);
         invoice.setPaymentMethod(null);
         invoice.setUndoReason(request.undoReason());

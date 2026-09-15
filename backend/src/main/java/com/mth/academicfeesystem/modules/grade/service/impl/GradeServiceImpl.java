@@ -22,7 +22,6 @@ import com.mth.academicfeesystem.modules.academic.repository.SchoolClassReposito
 import com.mth.academicfeesystem.modules.academic.repository.SemesterRepository;
 import com.mth.academicfeesystem.modules.academic.repository.SubjectRepository;
 import com.mth.academicfeesystem.modules.audit.annotation.Auditable;
-import com.mth.academicfeesystem.modules.audit.aspect.AuditContext;
 import com.mth.academicfeesystem.modules.grade.dto.request.GradeSaveRequest;
 import com.mth.academicfeesystem.modules.grade.dto.response.GradeTableResponse;
 import com.mth.academicfeesystem.modules.grade.dto.response.GradeTableResponse.GradeColumnConfig;
@@ -231,29 +230,21 @@ public class GradeServiceImpl implements GradeService {
                                                 request.semesterId(),
                                                 request.examType(),
                                                 request.ordinalNumber());
-
                 Grade grade;
                 if (existingGrade.isPresent()) {
                         grade = existingGrade.get();
                         if (grade.getScoreValue() == request.score()) {
-                                AuditContext.setBefore(null);
                                 return GradeDetailResponse.builder()
                                                 .gradeId(grade.getId())
                                                 .score(grade.getScoreValue())
                                                 .ordinalNumber(grade.getOrdinalNumber())
                                                 .build();
                         }
-                        AuditContext.setBefore(GradeDetailResponse.builder()
-                                        .gradeId(grade.getId())
-                                        .score(grade.getScoreValue())
-                                        .ordinalNumber(grade.getOrdinalNumber())
-                                        .build());
                         grade.setScoreValue(request.score());
                 } else {
                         Student student = studentRepo.getReferenceById(request.studentId());
                         Subject subject = subjectRepo.getReferenceById(subjectId);
                         Semester semester = semesterRepo.getReferenceById(request.semesterId());
-
                         grade = Grade.builder()
                                         .student(student)
                                         .subject(subject)
@@ -262,7 +253,6 @@ public class GradeServiceImpl implements GradeService {
                                         .ordinalNumber(request.ordinalNumber())
                                         .scoreValue(request.score())
                                         .build();
-                        AuditContext.setBefore(null);
                 }
                 Grade savedGrade = gradeRepo.save(grade);
                 return GradeDetailResponse.builder()

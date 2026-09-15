@@ -1,104 +1,139 @@
-# API Checklist - Hệ thống Quản lý Học vụ & Tài chính THPT
+# API Documentation
 
-> **Tổng số API:** 60 Endpoints
-> **Tiến độ:** Đang cập nhật...
+Tài liệu này được đối chiếu với các controller hiện tại. Tất cả endpoint bên dưới dùng tiền tố `/api`. Trừ các endpoint xác thực, request cần gửi access token theo dạng `Authorization: Bearer <access-token>`.
 
-### 1. Module Auth & Cá nhân (Tài khoản)
+## Quy ước quyền
 
-| STT | Code | Test | Method | API Endpoint | Mô tả chức năng |
-| :---: | :---: | :---: | :--- | :--- | :--- |
-| 1 | `[x]` | `[x]` | **POST** | `/api/auth/login` | Đăng nhập, cấp Access + Refresh Token |
-| 2 | `[x]` | `[x]` | **POST** | `/api/auth/refresh` | Xin cấp Token mới bằng Refresh Token |
-| 3 | `[x]` | `[x]` | **POST** | `/api/auth/logout` | Đăng xuất, vô hiệu hóa Token |
-| 4 | `[x]` | `[x]` | **GET** | `/api/users/me` | Lấy thông tin hồ sơ của chính mình |
-| 5 | `[x]` | `[x]` | **PUT** | `/api/users/me/profile` | Tự cập nhật hồ sơ cá nhân |
-| 6 | `[x]` | `[x]` | **PUT** | `/api/users/me/password` | Đổi mật khẩu cá nhân |
+| Quyền | Ý nghĩa |
+|---|---|
+| `ADMIN` | Quản trị hệ thống, danh mục, nhân sự, phân công, tài chính và audit |
+| `TEACHER` | Giáo viên; quyền GVCN và GVBM tiếp tục được kiểm tra theo assignment của lớp/môn |
+| `STUDENT` | Học sinh xem bảng điểm, hóa đơn và thông báo của mình |
+| `AUTHENTICATED` | Đã đăng nhập; quyền cụ thể có thể được kiểm tra thêm ở service |
 
-### 2. Module Quản lý Nhân sự (Admin)
+## 1. Xác thực và tài khoản
 
-| STT | Code | Test | Method | API Endpoint | Mô tả chức năng |
-| :---: | :---: | :---: | :--- | :--- | :--- |
-| 7 | `[x]` | `[x]` | **GET** | `/api/admin/teachers` | Lấy danh sách Giáo viên |
-| 8 | `[x]` | `[x]` | **GET** | `/api/admin/teachers/{id}` | Xem chi tiết 1 Giáo viên |
-| 9 | `[x]` | `[ ]` | **POST** | `/api/admin/teachers` | Tạo mới Giáo viên |
-| 10 | `[x]` | `[x]` | **PUT** | `/api/admin/teachers/{id}` | Cập nhật hồ sơ Giáo viên |
-| 11 | `[x]` | `[x]` | **GET** | `/api/admin/students` | Lấy danh sách Học sinh |
-| 12 | `[x]` | `[x]` | **GET** | `/api/admin/students/{id}` | Xem chi tiết 1 Học sinh |
-| 13 | `[x]` | `[ ]` | **POST** | `/api/admin/students` | Tạo mới Học sinh |
-| 14 | `[x]` | `[x]` | **PUT** | `/api/admin/students/{id}` | Cập nhật toàn bộ thông tin Học sinh |
-| 15 | `[x]` | `[x]` | **PATCH** | `/api/admin/students/{id}/status` | Đổi trạng thái Học sinh (Bảo lưu/Đình chỉ) |
+| Method | Endpoint | Quyền | Mô tả |
+|---|---|---|---|
+| POST | `/api/auth/login` | Public | Đăng nhập, cấp access token và refresh token |
+| POST | `/api/auth/refresh` | Public | Cấp access token mới từ refresh token |
+| POST | `/api/auth/logout` | Authenticated | Xóa refresh token hiện tại |
+| GET | `/api/users/me` | Authenticated | Xem hồ sơ cá nhân |
+| PUT | `/api/users/me/profile` | Authenticated | Cập nhật thông tin cá nhân |
+| PUT | `/api/users/me/password` | Authenticated | Đổi mật khẩu |
 
-### 3. Module Khung Đào Tạo (Academic)
+## 2. Quản lý người dùng và nhân sự
 
-| STT | Code | Test | Method | API Endpoint | Mô tả chức năng |
-| :---: | :---: | :---: | :--- | :--- | :--- |
-| 16 | `[x]` | `[x]` | **GET** | `/api/admin/subjects` | Lấy danh sách Môn học |
-| 17 | `[x]` | `[ ]` | **POST** | `/api/admin/subjects` | Tạo Môn học mới |
-| 18 | `[x]` | `[ ]` | **PUT** | `/api/admin/subjects/{id}` | Cập nhật thông tin Môn học |
-| 19 | `[x]` | `[ ]` | **PATCH** | `/api/admin/subjects/{id}/active`| Ẩn/Hiện môn học (Soft Delete) |
-| 20 | `[x]` | `[ ]` | **GET** | `/api/admin/cohorts` | Lấy danh sách Khóa học |
-| 21 | `[x]` | `[ ]` | **POST** | `/api/admin/cohorts` | Tạo Khóa học mới |
-| 22 | `[x]` | `[ ]` | **GET** | `/api/admin/academic-years` | Lấy danh sách Năm học |
-| 23 | `[x]` | `[ ]` | **POST** | `/api/admin/academic-years` | Tạo Năm học mới |
-| 24 | `[x]` | `[ ]` | **POST** | `/api/admin/academic-years/initialize`| Khởi tạo đồng loạt Năm + HK + Khóa |
-| 25 | `[ ]` | `[ ]` | **GET** | `/api/admin/semesters` | Lấy danh sách Học kỳ |
+| Method | Endpoint | Quyền | Mô tả |
+|---|---|---|---|
+| GET | `/api/admin/students` | ADMIN | Danh sách học sinh có phân trang/lọc |
+| GET | `/api/admin/teachers` | ADMIN | Danh sách giáo viên có phân trang/lọc |
+| GET | `/api/admin/students/{id}` | ADMIN | Chi tiết học sinh |
+| GET | `/api/admin/teachers/{id}` | ADMIN | Chi tiết giáo viên |
+| POST | `/api/admin/students` | ADMIN | Tạo học sinh |
+| POST | `/api/admin/students/import` | ADMIN | Import học sinh bằng multipart file |
+| PUT | `/api/admin/students/{id}` | ADMIN | Cập nhật học sinh |
+| PUT | `/api/admin/students/{id}/reset-password` | ADMIN | Đặt lại mật khẩu học sinh |
+| GET | `/api/admin/students/unenrollments` | ADMIN | Danh sách học sinh chưa xếp lớp |
+| POST | `/api/admin/teachers` | ADMIN | Tạo giáo viên |
+| PUT | `/api/admin/teachers/{id}` | ADMIN | Cập nhật giáo viên |
+| PUT | `/api/admin/teachers/{id}/reset-password` | ADMIN | Đặt lại mật khẩu giáo viên |
+| GET | `/api/admin/teachers/active` | ADMIN | Danh sách giáo viên đang hoạt động |
+| GET | `/api/departments` | Authenticated | Danh sách tổ bộ môn |
+| POST | `/api/admin/departments` | ADMIN | Tạo tổ bộ môn |
+| PUT | `/api/admin/departments/{id}` | ADMIN | Cập nhật tổ bộ môn |
+| GET | `/api/admin/teacher-expertises/workloads` | ADMIN | Xem chuyên môn và khối lượng giảng dạy |
 
-### 4. Module Lớp học & Xếp lớp (Class & Enrollment)
+## 3. Khung đào tạo và lớp học
 
-| STT | Code | Test | Method | API Endpoint | Mô tả chức năng |
-| :---: | :---: | :---: | :--- | :--- | :--- |
-| 26 | `[x]` | `[ ]` | **GET** | `/api/admin/classes` | Lấy danh sách Lớp |
-| 27 | `[x]` | `[ ]` | **POST** | `/api/admin/classes` | Tạo 1 Lớp học mới |
-| 28 | `[x]` | `[ ]` | **POST** | `/api/admin/classes/auto-promote` | Lên lớp tự động (Xét duyệt cuối năm) |
-| 29 | `[x]` | `[ ]` | **GET** | `/api/admin/classes/{classId}/students`| Xem danh sách Học sinh của 1 Lớp |
-| 30 | `[x]` | `[ ]` | **POST** | `/api/admin/class-enrollments/import` | Import danh sách học sinh vào lớp |
-| 31 | `[x]` | `[ ]` | **POST** | `/api/admin/class-enrollments/transfer`| Chuyển lớp cho học sinh |
+| Method | Endpoint | Quyền | Mô tả |
+|---|---|---|---|
+| GET | `/api/academic-years` | Authenticated | Danh sách năm học |
+| POST | `/api/admin/academic-years` | ADMIN | Tạo năm học và dữ liệu liên quan |
+| PUT | `/api/admin/academic-years/{id}` | ADMIN | Cập nhật năm học |
+| GET | `/api/academic-years/{academicYearId}/classes` | Authenticated | Danh sách lớp theo năm học |
+| GET | `/api/academic-years/{academicYearId}/semesters` | Authenticated | Danh sách học kỳ theo năm học |
+| GET | `/api/student/academic-years` | STUDENT | Năm học mà học sinh có dữ liệu |
+| GET | `/api/cohorts` | Authenticated | Danh sách khóa học |
+| POST | `/api/admin/cohorts` | ADMIN | Tạo khóa học |
+| GET | `/api/subjects` | Authenticated | Danh sách môn học |
+| GET | `/api/admin/subjects` | ADMIN | Danh sách môn học quản trị |
+| POST | `/api/admin/subjects` | ADMIN | Tạo môn học |
+| PUT | `/api/admin/subjects/{id}` | ADMIN | Cập nhật môn học |
+| GET | `/api/classes` | Authenticated | Danh sách lớp theo bộ lọc |
+| POST | `/api/classes` | Authenticated | Tạo lớp theo controller hiện tại |
+| POST | `/api/classes/auto-promote` | Authenticated | Tự động lên lớp |
+| GET | `/api/classes/academic-years/{academicYearId}/total` | Authenticated | Tổng hợp số lớp theo năm học |
+| GET | `/api/classes/{classId}/students` | Authenticated | Danh sách học sinh của lớp |
+| POST | `/api/admin/class-enrollments` | ADMIN | Import/xếp học sinh vào lớp |
+| POST | `/api/admin/class-enrollments/transfer` | ADMIN | Chuyển học sinh sang lớp khác |
 
-### 5. Module Phân công (Assignment)
+## 4. Phân công giáo viên
 
-| STT | Code | Test | Method | API Endpoint | Mô tả chức năng |
-| :---: | :---: | :---: | :--- | :--- | :--- |
-| 32 | `[x]` | `[ ]` | **POST** | `/api/admin/homeroom-assignments` | Phân công GVCN cho Lớp |
-| 33 | `[x]` | `[ ]` | **PUT** | `/api/admin/homeroom-assignments/{id}/end`| Kết thúc nhiệm kỳ GVCN |
-| 34 | `[x]` | `[ ]` | **GET** | `/api/teachers/me/homeroom-classes` | GV xem danh sách Lớp mình chủ nhiệm |
-| 35 | `[x]` | `[ ]` | **POST** | `/api/admin/teaching-assignments` | Phân công Giáo viên dạy bộ môn cho Lớp |
-| 36 | `[x]` | `[ ]` | **DELETE**| `/api/admin/teaching-assignments/{id}` | Gỡ phân công dạy bộ môn |
-| 37 | `[x]` | `[ ]` | **GET** | `/api/teachers/me/teaching-assignments`| GV xem lịch/danh sách lớp+môn mình dạy |
+| Method | Endpoint | Quyền | Mô tả |
+|---|---|---|---|
+| POST | `/api/admin/homeroom-assignments` | Theo controller hiện tại | Phân công GVCN hàng loạt |
+| PUT | `/api/admin/homeroom-assignments/{id}/end` | Theo controller hiện tại | Kết thúc phân công GVCN |
+| GET | `/api/admin/homeroom-assignments` | ADMIN | Xem phân công GVCN theo năm học |
+| GET | `/api/teacher/homeroom-classes` | TEACHER | Xem lớp chủ nhiệm, gồm assignment lịch sử |
+| GET | `/api/teacher/homeroom-classes/{classId}/students` | Assignment GVCN | Xem học sinh trong lớp chủ nhiệm |
+| GET | `/api/teacher/homeroom-classes/{schoolClassId}/students/{studentId}/transcript` | Assignment GVCN | Xem bảng điểm học sinh trong lớp |
+| GET | `/api/admin/teaching-assignments` | ADMIN | Xem phân công GVBM |
+| GET | `/api/admin/teaching-assignments/copy-previous` | ADMIN | Chuẩn bị phân công từ năm trước |
+| GET | `/api/admin/teaching-assignments/preview-auto` | ADMIN | Xem trước phân công tự động |
+| POST | `/api/admin/teaching-assignments/bulk` | ADMIN | Lưu phân công GVBM hàng loạt |
+| GET | `/api/teacher/teaching-assignments/academic-years/{academicYearId}` | Theo controller hiện tại | Xem lớp và môn giáo viên được phân công |
 
-### 6. Module Quản lý Điểm số (Grade)
+## 5. Điểm số
 
-| STT | Code | Test | Method | API Endpoint | Mô tả chức năng |
-| :---: | :---: | :---: | :--- | :--- | :--- |
-| 38 | `[x]` | `[ ]` | **GET** | `/api/admin/grade-configs` | Xem cấu hình điểm (Hệ số, số cột) |
-| 39 | `[x]` | `[ ]` | **POST** | `/api/admin/grade-configs` | Tạo cấu hình điểm cho môn học |
-| 40 | `[x]` | `[ ]` | **PUT** | `/api/admin/grade-configs/{id}` | Sửa cấu hình điểm |
-| 41 | `[x]` | `[ ]` | **POST** | `/api/teachers/grades` | GV nhập điểm (Chỉ được nhập lớp mình dạy)|
-| 42 | `[x]` | `[ ]` | **PUT** | `/api/teachers/grades/{id}` | GV sửa điểm (Yêu cầu lưu Audit log) |
-| 43 | `[x]` | `[ ]` | **GET** | `/api/teachers/classes/{classId}/subjects/{subjectId}/grades`| GV xem bảng điểm lớp mình dạy |
-| 44 | `[ ]` | `[ ]` | **GET** | `/api/teachers/homeroom-classes/{classId}/grade-summary`| GVCN xem thống kê điểm toàn lớp chủ nhiệm|
-| 45 | `[x]` | `[ ]` | **GET** | `/api/students/me/grades` | Học sinh tự xem bảng điểm cá nhân |
+| Method | Endpoint | Quyền | Mô tả |
+|---|---|---|---|
+| POST | `/api/admin/grade-configs` | ADMIN | Tạo cấu hình cột điểm |
+| PUT | `/api/admin/grade-configs` | ADMIN | Cập nhật cấu hình cột điểm |
+| GET | `/api/admin/grade-configs/{subjectId}` | ADMIN | Xem cấu hình điểm theo môn |
+| GET | `/api/admin/grades/students/{studentId}/transcript` | ADMIN | Xem bảng điểm học sinh |
+| GET | `/api/teacher/classes/{classId}/subjects/{subjectId}/grades` | GVBM assignment | Xem bảng điểm lớp/môn |
+| POST | `/api/teacher/classes/{classId}/subjects/{subjectId}/grades/auto-save` | GVBM assignment | Tạo hoặc cập nhật một điểm |
+| GET | `/api/student/grades/transcript` | STUDENT | Học sinh xem bảng điểm theo năm học |
 
-### 7. Module Tài chính & Học phí (Finance)
+## 6. Học phí và hóa đơn
 
-| STT | Code | Test | Method | API Endpoint | Mô tả chức năng |
-| :---: | :---: | :---: | :--- | :--- | :--- |
-| 46 | `[ ]` | `[ ]` | **GET** | `/api/admin/fees` | Admin xem danh sách đợt thu học phí |
-| 47 | `[ ]` | `[ ]` | **POST** | `/api/admin/fees` | Admin tạo đợt thu học phí mới |
-| 48 | `[ ]` | `[ ]` | **PUT** | `/api/admin/fees/{id}` | Admin sửa thông tin đợt thu (hạn chót, giá)|
-| 49 | `[ ]` | `[ ]` | **POST** | `/api/admin/fee-invoices/generate` | Admin phát hành hóa đơn hàng loạt |
-| 50 | `[ ]` | `[ ]` | **GET** | `/api/teachers/me/homeroom-classes/{classId}/fee-invoices`| GVCN xem danh sách thu tiền của lớp mình |
-| 51 | `[ ]` | `[ ]` | **PATCH** | `/api/teachers/fee-invoices/{id}/confirm-cash`| GVCN xác nhận đã thu tiền mặt của HS |
-| 52 | `[ ]` | `[ ]` | **PATCH** | `/api/teachers/fee-invoices/{id}/cancel` | GVCN hủy/hoàn tác hóa đơn (Có Audit Log) |
-| 53 | `[ ]` | `[ ]` | **GET** | `/api/students/me/fee-invoices` | HS xem hóa đơn học phí cá nhân |
-| 54 | `[ ]` | `[ ]` | **POST** | `/api/students/me/fee-invoices/{id}/pay` | HS bấm thanh toán online VNPay |
-| 55 | `[ ]` | `[ ]` | **GET** | `/api/public/payments/vnpay-return` | Mở Public: Frontend bắt kết quả VNPay |
-| 56 | `[ ]` | `[ ]` | **POST** | `/api/public/payments/vnpay-ipn` | Mở Public: Webhook VNPay báo kết quả |
+| Method | Endpoint | Quyền | Mô tả |
+|---|---|---|---|
+| GET | `/api/admin/fees` | ADMIN | Danh sách đợt thu |
+| POST | `/api/admin/fees` | ADMIN | Tạo đợt thu |
+| PUT | `/api/admin/fees/{id}` | ADMIN | Cập nhật đợt thu |
+| POST | `/api/admin/fees/{feeId}/invoices/generate` | ADMIN | Phát hành hóa đơn hàng loạt |
+| GET | `/api/admin/invoices` | ADMIN | Danh sách hóa đơn |
+| GET | `/api/admin/invoices/{invoiceId}` | ADMIN | Chi tiết hóa đơn |
+| POST | `/api/admin/invoices/confirm-cash` | ADMIN | Xác nhận thu tiền mặt |
+| POST | `/api/admin/invoices/undo` | ADMIN | Hoàn tác hóa đơn |
+| POST | `/api/teacher/invoices/confirm-cash` | Assignment GVCN | GVCN xác nhận thu tiền mặt |
+| POST | `/api/teacher/invoices/undo` | Assignment GVCN | GVCN hoàn tác hóa đơn |
+| GET | `/api/teacher/students/{studentId}/invoices` | Assignment GVCN | Xem hóa đơn của học sinh trong lớp |
+| GET | `/api/student/invoices` | STUDENT | Xem danh sách hóa đơn cá nhân |
+| GET | `/api/student/invoices/{invoiceId}` | STUDENT | Xem chi tiết hóa đơn cá nhân |
+| POST | `/api/student/invoices/{invoiceId}/pay` | STUDENT | Thanh toán hóa đơn theo service hiện tại |
 
-### 8. Module Thông báo & Lịch sử hệ thống (Notification & Audit)
+## 7. Thông báo và audit
 
-| STT | Code | Test | Method | API Endpoint | Mô tả chức năng |
-| :---: | :---: | :---: | :--- | :--- | :--- |
-| 57 | `[ ]` | `[ ]` | **POST** | `/api/admin/notifications` | Tạo và gửi thông báo (tới Học sinh/Lớp) |
-| 58 | `[ ]` | `[ ]` | **GET** | `/api/admin/notifications` | Xem lịch sử các thông báo đã gửi |
-| 59 | `[ ]` | `[ ]` | **GET** | `/api/students/me/notifications` | Học sinh xem thông báo (của trường/GVCN) |
-| 60 | `[ ]` | `[ ]` | **GET** | `/api/admin/audit-logs` | Xem log hệ thống (Sửa điểm, Hủy tiền) |
+| Method | Endpoint | Quyền | Mô tả |
+|---|---|---|---|
+| GET | `/api/admin/notifications` | ADMIN | Danh sách thông báo |
+| POST | `/api/admin/notifications` | ADMIN | Tạo thông báo |
+| PUT | `/api/admin/notifications/{id}` | ADMIN | Cập nhật thông báo |
+| GET | `/api/admin/notifications/{id}` | ADMIN | Chi tiết thông báo |
+| POST | `/api/admin/notifications/{id}/send-to-students` | ADMIN | Gửi thông báo tới học sinh |
+| GET | `/api/student/notifications` | STUDENT | Danh sách thông báo học sinh |
+| GET | `/api/student/notifications/{notificationId}` | STUDENT | Chi tiết thông báo học sinh |
+| GET | `/api/admin/audit-logs/grades` | ADMIN | Audit log liên quan đến điểm |
+| GET | `/api/admin/audit-logs/grades/{id}` | ADMIN | Chi tiết audit log điểm |
+| GET | `/api/admin/audit-logs/invoices` | ADMIN | Audit log liên quan đến hóa đơn |
+| GET | `/api/admin/audit-logs/invoices/{id}` | ADMIN | Chi tiết audit log hóa đơn |
+
+## 8. Swagger
+
+- OpenAPI JSON: `/v3/api-docs`
+- Swagger UI: `/swagger-ui.html`
+
+Trạng thái test HTTP cần được cập nhật sau khi kiểm thử thực tế; controller tồn tại không đồng nghĩa endpoint đã được test end-to-end.

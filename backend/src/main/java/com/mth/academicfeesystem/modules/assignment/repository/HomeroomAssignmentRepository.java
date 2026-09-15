@@ -18,7 +18,7 @@ public interface HomeroomAssignmentRepository extends JpaRepository<HomeroomAssi
 
     Optional<HomeroomAssignment> findByTeacherIdAndStatus(Long teacherId, AssignmentStatus status);
 
-    boolean existsByTeacherIdAndSchoolClassIdAndStatus(Long teacherId, Long classId, AssignmentStatus status);
+    boolean existsByTeacherIdAndSchoolClassId(Long teacherId, Long classId);
 
     Optional<HomeroomAssignment> findBySchoolClassIdAndStatus(Long classId, AssignmentStatus status);
     @EntityGraph(attributePaths = {"schoolClass","schoolClass.academicYear"})
