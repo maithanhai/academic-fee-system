@@ -1,6 +1,3 @@
-# Academic Fee System
-
-Academic Fee System là hệ thống quản lý học vụ và tài chính cho trường trung học phổ thông. Hệ thống quản lý người dùng, giáo viên, học sinh, năm học, lớp, phân công giáo viên, điểm số, các đợt thu học phí, hóa đơn, thông báo và lịch sử thao tác quan trọng.
 
 ## Công nghệ sử dụng
 
