@@ -66,6 +66,8 @@
 Tạo database `academic_fee_system` hoặc để ứng dụng tự tạo database theo cấu hình hiện tại. Backend đọc cấu hình từ `backend/src/main/resources/application.yml` và có thể ghi đè bằng biến môi trường trong file `backend/.env`:
 
 ```env
+DB_URL=your_url_database
+DB_USERNAME=your_mysql_username
 DB_PASSWORD=your_mysql_password
 JWT_SECRET=your_secret_key_at_least_256_bits
 MAIL_USERNAME=
@@ -99,7 +101,7 @@ npm install
 npm run dev
 ```
 
-Frontend mặc định chạy tại địa chỉ Vite in trong terminal, thường là `http://localhost:5173`.
+Frontend mặc định chạy tại địa chỉ Vite in trong terminal là `http://localhost:5173`.
 
 Các script frontend:
 
