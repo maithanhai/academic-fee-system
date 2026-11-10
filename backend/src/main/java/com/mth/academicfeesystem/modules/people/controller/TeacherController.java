@@ -47,6 +47,7 @@ public class TeacherController {
         return ResponseEntity.ok(new ApiResponse<>("Cập nhật thông tin giáo viên thành công",response));
     }
 
+    @PreAuthorize ("hasRole('ADMIN')")
     @PutMapping("/admin/teachers/{id}/reset-password")
     public ResponseEntity<ApiResponse<?>> resetPassword(
         @PathVariable Long id
@@ -55,6 +56,7 @@ public class TeacherController {
         return ResponseEntity.ok(new ApiResponse<>("Reset password successful"));
     }
 
+    @PreAuthorize ("hasRole('ADMIN')")
     @PostMapping("/admin/teachers")
     public ResponseEntity<ApiResponse<?>> registerTeacher(
         @Valid @RequestBody RegisterTeacherRequest request

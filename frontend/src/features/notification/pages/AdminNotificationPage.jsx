@@ -22,8 +22,8 @@ const AdminNotificationPage = () => {
       message.success(
         res.data.message || "Đã đưa vào hàng đợi gửi email thành công!",
       );
-    } catch {
-      message.error("Gửi email thất bại.");
+    } catch (error) {
+      message.error(error.response?.data?.message || "Thao tác thất bại");
     }
   };
   return (
@@ -31,7 +31,7 @@ const AdminNotificationPage = () => {
       variant={false}
       title={
         <Title level={3} style={{ margin: 0 }}>
-          Quản lý Thông báo
+          Quản lý thông báo
         </Title>
       }
     >

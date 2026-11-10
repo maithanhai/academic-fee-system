@@ -11,5 +11,7 @@ const classApi = {
   createClass: (data) => {
     return axiosClient.post("/admin/classes", data);
   },
+  autoPromote: (classId) =>
+    axiosClient.post(`/admin/classes/${classId}/auto-promote`),
 };
 export default classApi;

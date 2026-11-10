@@ -9,10 +9,6 @@ const gradeApi = {
         params: { semesterId },
       },
     ),
-  getMyGrades: (semesterId) =>
-    axiosClient.get("/students/me/grades", { params: { semesterId } }),
-  updateGradeByTeacher: (gradeId, data) =>
-    axiosClient.put(`/teachers/grades/${gradeId}`, data),
 
   getTranscriptByAdmin: (studentId, classId) =>
     axiosClient.get(`/admin/grades/students/${studentId}/transcript`, { params: { classId } }),

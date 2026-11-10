@@ -7,7 +7,10 @@ import com.mth.academicfeesystem.security.CustomUserPrincipal;
 
 public interface UserService {
     MyProfileResponse getMyProfile(Long userId);
-    MyProfileResponse updateMyProfile(CustomUserPrincipal principal,UpdateProfileRequest request);
+
+    MyProfileResponse updateMyProfile(CustomUserPrincipal principal, UpdateProfileRequest request);
+
     void changePassword(Long userId, ChangePasswordRequest request);
+
     void resetPassword(Long userId);
 }

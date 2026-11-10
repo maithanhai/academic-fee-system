@@ -78,12 +78,14 @@ const StudentGradeTablePage = () => {
   ];
 
   return (
-    <div className="student-grade-page">
-      <Title level={3} style={{ marginBottom: 20 }}>
-        Kết quả học tập các năm học
-      </Title>
-
-      <Card variant={false}>
+    <Card
+      variant={false}
+      title={
+        <Title level={3} style={{ margin: 0 }}>
+          Kết quả học tập các năm học
+        </Title>
+      }
+    >
         <Table
           columns={columns}
           dataSource={academicYears}
@@ -98,8 +100,7 @@ const StudentGradeTablePage = () => {
           onClose={() => setIsModalOpen(false)}
           fetchData={() => gradeApi.getTranscriptByStudent(selectedYear?.id)}
         />
-      </Card>
-    </div>
+    </Card>
   );
 };
 

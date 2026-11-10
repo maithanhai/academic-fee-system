@@ -24,6 +24,7 @@ import com.mth.academicfeesystem.modules.academic.repository.ClassEnrollmentRepo
 import com.mth.academicfeesystem.modules.academic.repository.SchoolClassRepository;
 import com.mth.academicfeesystem.modules.assignment.entity.HomeroomAssignment;
 import com.mth.academicfeesystem.modules.audit.annotation.Auditable;
+import com.mth.academicfeesystem.modules.audit.aspect.AuditContext;
 import com.mth.academicfeesystem.modules.finance.dto.request.FeeInvoiceSearchRequest;
 import com.mth.academicfeesystem.modules.finance.dto.request.InvoiceConfirmByAdminRequest;
 import com.mth.academicfeesystem.modules.finance.dto.request.InvoiceConfirmByTeacherRequest;
@@ -175,6 +176,7 @@ public class FeeInvoiceServiceImpl implements FeeInvoiceService {
             throw new BusinessException("Học sinh không thuộc lớp học này");
         FeeInvoice invoice = feeInvoiceRepo.findByIdAndStudentId(request.invoiceId(), request.studentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy hóa đơn"));
+        AuditContext.setBefore(invoiceAuditSnapshot(invoice));
         if (!invoice.getFee().getAcademicYear().getActive()) {
             throw new BusinessException("Năm học của khoản thu này đã đóng");
         }
@@ -187,7 +189,6 @@ public class FeeInvoiceServiceImpl implements FeeInvoiceService {
         invoice.setStatus(InvoiceStatus.PAID);
         invoice.setPaymentMethod(PaymentMethod.CASH);
         invoice.setActionBy(userRepo.getReferenceById(principal.getId()));
-        invoice.setUndoReason(null);
         feeInvoiceRepo.save(invoice);
         return FeeInvoiceResponse.builder()
                 .invoiceId(invoice.getId())
@@ -207,6 +208,7 @@ public class FeeInvoiceServiceImpl implements FeeInvoiceService {
             InvoiceConfirmByAdminRequest request) {
         FeeInvoice invoice = feeInvoiceRepo.findById(request.invoiceId())
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy hóa đơn"));
+        AuditContext.setBefore(invoiceAuditSnapshot(invoice));
         if (invoice.getStatus() == InvoiceStatus.PAID) {
             throw new BusinessException("Hóa đơn này đã được thanh toán");
         }
@@ -235,6 +237,7 @@ public class FeeInvoiceServiceImpl implements FeeInvoiceService {
     public FeeInvoiceResponse undoInvoiceByAdmin(CustomUserPrincipal principal, InvoiceUndoByAdminRequest request) {
         FeeInvoice invoice = feeInvoiceRepo.findById(request.invoiceId())
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy hóa đơn"));
+        AuditContext.setBefore(invoiceAuditSnapshot(invoice));
         if (invoice.getStatus() != InvoiceStatus.PAID) {
             throw new BusinessException("Chỉ được hoàn tác hóa đơn đã thanh toán");
         }
@@ -264,6 +267,7 @@ public class FeeInvoiceServiceImpl implements FeeInvoiceService {
             throw new BusinessException("Học sinh không thuộc lớp học này");
         FeeInvoice invoice = feeInvoiceRepo.findByIdAndStudentId(request.invoiceId(), request.studentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy hóa đơn"));
+        AuditContext.setBefore(invoiceAuditSnapshot(invoice));
         if (!invoice.getFee().getAcademicYear().getActive()) {
             throw new BusinessException("Năm học của khoản thu này đã đóng");
         }
@@ -289,6 +293,17 @@ public class FeeInvoiceServiceImpl implements FeeInvoiceService {
                 .undoReason(invoice.getUndoReason())
                 .studentName(invoice.getStudent().getUser().getFullName())
                 .build();
+    }
+
+    private Map<String, Object> invoiceAuditSnapshot(FeeInvoice invoice) {
+        Map<String, Object> snapshot = new HashMap<>();
+        snapshot.put("invoiceId", invoice.getId());
+        snapshot.put("status", invoice.getStatus());
+        snapshot.put("paymentMethod", invoice.getPaymentMethod());
+        snapshot.put("undoReason", invoice.getUndoReason());
+        snapshot.put("actionBy", invoice.getActionBy() == null ? null : invoice.getActionBy().getId());
+        snapshot.put("amount", invoice.getAmount());
+        return snapshot;
     }
 
     @Override

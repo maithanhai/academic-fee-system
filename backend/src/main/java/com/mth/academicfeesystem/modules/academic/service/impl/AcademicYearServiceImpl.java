@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.mth.academicfeesystem.common.enums.SemesterName;
 import com.mth.academicfeesystem.common.exception.BusinessException;
@@ -26,7 +27,6 @@ import com.mth.academicfeesystem.modules.academic.service.AcademicYearService;
 import com.mth.academicfeesystem.modules.academic.service.ClassEnrollmentService;
 import com.mth.academicfeesystem.security.CustomUserPrincipal;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -38,6 +38,7 @@ public class AcademicYearServiceImpl implements AcademicYearService {
     private final SchoolClassRepository schoolClassRepo;
     private final SchoolClassMapper schoolClassMapper;
     private final ClassEnrollmentService classEnrollmentService;
+
     @Override
     public List<AcademicYearResponse> getAllAcademicYears() {
         List<AcademicYear> response = academicYearRepo.findAll(Sort.by(Sort.Direction.DESC, "id"));
@@ -48,33 +49,37 @@ public class AcademicYearServiceImpl implements AcademicYearService {
     @Override
     public AcademicYearResponse addAcademicYear() {
         AcademicYear academicYear = new AcademicYear();
-            LocalDate currentDate = LocalDate.now();
-            academicYear.setName(currentDate.getYear() + " - " + (currentDate.getYear() + 1));
-        AcademicYear currentAcademicYear = academicYearRepo.findByName(academicYear.getName()).get();
-        if (currentAcademicYear.getActive())
-            throw new BusinessException("Năm học trước chưa đóng, không thể tạo năm học mới");
-        else {
-            if (!academicYearRepo.findAll().isEmpty()) {
-                if (academicYearRepo.existsByName(academicYear.getName())) {
-                    throw new DuplicateResourceException(
-                            "Năm học " + academicYear.getName() + " đã tồn tại trong hệ thống");
-                }
-                AcademicYear savedAcademicYear = academicYearRepo.save(academicYear);
-                Semester firstSemester = Semester.builder()
-                        .name(SemesterName.FIRST_SEMESTER)
-                        .academicYear(savedAcademicYear)
-                        .build();
-                Semester secondSemester = Semester.builder()
-                        .name(SemesterName.SECOND_SEMESTER)
-                        .academicYear(savedAcademicYear)
-                        .build();
-                semesterRepo.saveAll(Arrays.asList(firstSemester, secondSemester));
-                return academicYearMapper.toResponse(savedAcademicYear);
+        LocalDate currentDate = LocalDate.now();
+        academicYear.setName(currentDate.getYear() + "-" + (currentDate.getYear() + 1));
+        if (academicYearRepo.existsByName(academicYear.getName())) {
+            AcademicYear existingAcademicYear = academicYearRepo.findByName(academicYear.getName())
+                    .orElseThrow(() -> new ResourceNotFoundException("Năm học không tồn tại"));
+            if (Boolean.TRUE.equals(existingAcademicYear.getActive())) {
+                throw new BusinessException("Năm học hiện tại đang mở, không thể tạo lại");
             }
+            throw new DuplicateResourceException(
+                    "Năm học " + academicYear.getName() + " đã tồn tại trong hệ thống");
         }
-        return academicYearMapper.toResponse(academicYear);
+        boolean hasActiveAcademicYear = academicYearRepo.findAll().stream()
+                .anyMatch(year -> Boolean.TRUE.equals(year.getActive()));
+        if (hasActiveAcademicYear) {
+            throw new BusinessException("Năm học trước chưa đóng, không thể tạo năm học mới");
+        }
+
+        AcademicYear savedAcademicYear = academicYearRepo.save(academicYear);
+        Semester firstSemester = Semester.builder()
+                .name(SemesterName.FIRST_SEMESTER)
+                .academicYear(savedAcademicYear)
+                .build();
+        Semester secondSemester = Semester.builder()
+                .name(SemesterName.SECOND_SEMESTER)
+                .academicYear(savedAcademicYear)
+                .build();
+        semesterRepo.saveAll(Arrays.asList(firstSemester, secondSemester));
+        return academicYearMapper.toResponse(savedAcademicYear);
     }
 
+    @Transactional
     @Override
     public AcademicYearResponse updateActiveAcademicYear(Long academicYearId, AcademicYearRequest request) {
         AcademicYear academicYear = academicYearRepo.findById(academicYearId)
@@ -82,10 +87,10 @@ public class AcademicYearServiceImpl implements AcademicYearService {
         if (academicYear.getActive() == request.active())
             return academicYearMapper.toResponse(academicYear);
         academicYear.setActive(request.active());
-        academicYearRepo.save(academicYear);
         if (!academicYear.getActive()) {
             classEnrollmentService.dropEnrollmentsByAcademicYearId(academicYearId);
         }
+        academicYearRepo.save(academicYear);
         return academicYearMapper.toResponse(academicYear);
     }
 

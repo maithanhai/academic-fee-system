@@ -12,7 +12,7 @@ public interface SchoolClassService {
 
     SchoolClassResponse createClass(SchoolClassRequest request);
 
-    void autoPromoteStudents();
+    void autoPromoteStudentsByClassId(Long classId);
 
     List<SchoolClassListResponse> getClassesByAcademicYearId(Long academicYearId);
 

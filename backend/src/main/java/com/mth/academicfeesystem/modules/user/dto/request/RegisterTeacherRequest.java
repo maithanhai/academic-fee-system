@@ -17,7 +17,7 @@ public record RegisterTeacherRequest(
     LocalDate dateOfBirth,
     String phone,   
     String email,
-    @NotBlank(message = "Gender is required")
+    @NotNull(message = "Gender is required")
     Gender gender,
     @NotNull Long departmentId,
     @NotEmpty(message = "Must choose at least one subject")

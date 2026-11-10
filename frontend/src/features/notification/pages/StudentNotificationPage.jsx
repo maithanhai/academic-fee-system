@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Table, Input, Button, Space, Typography, message } from "antd";
+import { Card, Table, Input, Button, Space, Typography, message } from "antd";
 import { SearchOutlined, BellOutlined } from "@ant-design/icons";
 import notificationApi from "../api/notificationApi";
 import NotificationModal from "../components/NotificationModal";
@@ -19,8 +19,8 @@ const StudentNotificationPage = () => {
     try {
       const res = await notificationApi.getNotificationsForStudent();
       setNotifications(res.data.data || []);
-    } catch {
-      message.error("Lỗi khi tải danh sách thông báo!");
+    } catch (error) {
+      message.error(error.response?.data?.message || "Lỗi khi tải danh sách thông báo!");
     } finally {
       setLoading(false);
     }
@@ -70,7 +70,15 @@ const StudentNotificationPage = () => {
   ];
 
   return (
-    <Space orientation="vertical" size="middle" style={{ display: "flex" }}>
+    <Card
+      variant={false}
+      title={
+        <Title level={3} style={{ margin: 0 }}>
+          Thông báo
+        </Title>
+      }
+    >
+      <Space orientation="vertical" size="middle" style={{ display: "flex" }}>
       <div
         style={{
           display: "flex",
@@ -79,9 +87,6 @@ const StudentNotificationPage = () => {
           gap: 16,
         }}
       >
-        <Title level={4} style={{ margin: 0 }}>
-          Thông báo
-        </Title>
         <Space wrap>
           <Input
             prefix={<SearchOutlined />}
@@ -107,7 +112,8 @@ const StudentNotificationPage = () => {
         onClose={() => setModalOpen(false)}
         notificationId={selectedId}
       />
-    </Space>
+      </Space>
+    </Card>
   );
 };
 

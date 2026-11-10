@@ -3,8 +3,10 @@ package com.mth.academicfeesystem.modules.assignment.service.impl;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -53,6 +55,18 @@ public class HomeroomAssignmentServiceImpl implements HomeroomAssignmentService 
                 if (!academicYear.getActive()) {
                         throw new BusinessException("Năm học đã khóa sổ, không thể thay đổi phân công");
                 }
+                Set<Long> requestClassIds = new HashSet<>();
+                Set<Long> requestTeacherIds = new HashSet<>();
+                for (HomeroomAssignmentRequest item : assignments) {
+                        if (!requestClassIds.add(item.classId())) {
+                                throw new BusinessException("Request chứa lớp bị lặp: " + item.classId());
+                        }
+                        if (item.teacherId() != null && !requestTeacherIds.add(item.teacherId())) {
+                                throw new BusinessException(
+                                                "Request chứa giáo viên chủ nhiệm bị lặp: " + item.teacherId());
+                        }
+                }
+
                 // gom id để truy vấn
                 List<Long> classIds = assignments.stream().map(HomeroomAssignmentRequest::classId).distinct().toList();
                 List<Long> teacherIds = assignments.stream().map(HomeroomAssignmentRequest::teacherId)
@@ -66,7 +80,8 @@ public class HomeroomAssignmentServiceImpl implements HomeroomAssignmentService 
                                 .findBySchoolClassIdInAndStatus(classIds, AssignmentStatus.ACTIVE).stream()
                                 .collect(Collectors.toMap(a -> a.getSchoolClass().getId(), a -> a));
                 Map<Long, HomeroomAssignment> teacherActiveAssignments = homeroomAssignmentRepo
-                                .findByTeacherIdInAndStatus(teacherIds, AssignmentStatus.ACTIVE).stream()
+                                .findByTeacherIdsAndStatusAndAcademicYearId(
+                                                teacherIds, AssignmentStatus.ACTIVE, academicYearId).stream()
                                 .collect(Collectors.toMap(a -> a.getTeacher().getId(), a -> a));
 
                 List<HomeroomAssignment> assignmentsToSave = new ArrayList<>();

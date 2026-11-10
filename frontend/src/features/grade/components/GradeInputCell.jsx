@@ -50,7 +50,7 @@ const GradeInputCell = ({
       } catch (error) {
         console.error(error);
         setStatus("IDLE");
-        message.error("Lỗi lưu điểm!");
+        message.error(error.response?.data?.message || "Thao tác thất bại");
         setValue(originalValueRef.current);
       }
     },

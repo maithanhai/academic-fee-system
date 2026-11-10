@@ -66,7 +66,7 @@ Academic Fee System là hệ thống quản lý học vụ và tài chính cho t
 
 ### 1. Cấu hình backend
 
-Tạo database `academic_fee_system` hoặc để ứng dụng tự tạo database theo cấu hình hiện tại. Backend đọc cấu hình từ `backend/src/main/resources/application.yml` và có thể ghi đè bằng biến môi trường trong file `backend/.env`:
+Ứng dụng tự tạo database `academic_fee_system` theo cấu hình hiện tại. Backend đọc cấu hình từ `backend/src/main/resources/application.yml` và có thể ghi đè bằng biến môi trường trong file `backend/.env`:
 
 ```env
 DB_PASSWORD=your_mysql_password
@@ -77,13 +77,29 @@ MAIL_PASSWORD=
 
 Trong giai đoạn phát triển, Hibernate đang dùng `ddl-auto: update` để cập nhật bảng từ entity. Không dùng mật khẩu mặc định khi chạy môi trường thật.
 
+### 1.1. Import cơ sở dữ liệu mẫu từ `docs`
+
+Project có sẵn file dữ liệu mẫu [docs/academic_fee_system.sql](docs/academic_fee_system.sql). File này chứa cấu trúc/dữ liệu mẫu và tự chọn database `academic_fee_system`. Chỉ import file trên database mới hoặc database đã làm sạch vì file sử dụng ID cố định và có thể bị lỗi trùng khóa nếu dữ liệu cũ đã tồn tại.
+
+#### Import bằng MySQL Workbench
+
+1. Mở MySQL Workbench và kết nối tới MySQL local.
+2. Chọn **File > Open SQL Script**.
+3. Mở file `docs/academic_fee_system.sql`.
+4. Bấm **Execute** để chạy toàn bộ script.
+5. Refresh mục **Schemas** và kiểm tra database `academic_fee_system`.
+
+Sau khi import xong, kiểm tra lại `backend/.env` để `DB_PASSWORD` đúng với tài khoản MySQL, rồi chạy backend. Vì backend đang dùng `ddl-auto: update`, Hibernate sẽ kiểm tra/cập nhật schema còn thiếu theo entity.
+
+Tài khoản mẫu trong file SQL dùng mật khẩu đã được mã hóa BCrypt; khi cần đăng nhập bằng dữ liệu mẫu, sử dụng thông tin tài khoản được cung cấp trong script với mật khẩu mặc định là "123456".
+
 ### 2. Chạy backend
 
 Windows:
 
-```powershell
+```command prompt
 cd backend
-./mvnw.cmd spring-boot:run
+mvn clean compile spring-boot:run
 ```
 
 Backend mặc định chạy tại `http://localhost:8080`.
@@ -96,13 +112,13 @@ OpenAPI JSON: `http://localhost:8080/v3/api-docs`
 
 Mở terminal khác:
 
-```powershell
+```command prompt
 cd frontend
 npm install
 npm run dev
 ```
 
-Frontend mặc định chạy tại địa chỉ Vite in trong terminal, thường là `http://localhost:5173`.
+Frontend mặc định chạy tại địa chỉ Vite in trong terminal với `http://localhost:5173`.
 
 Các script frontend:
 
@@ -116,23 +132,6 @@ npm run preview
 ### 4. Mail local
 
 Backend hiện cấu hình SMTP local ở `localhost:1025`, đây là cổng SMTP của MailDev để ứng dụng gửi email. Giao diện web MailDev thường chạy ở `http://localhost:1080` để xem email. Khi cần kiểm thử email, chạy MailDev hoặc một SMTP testing server tương thích; nếu dùng cổng khác, thay các giá trị `spring.mail` trong cấu hình.
-
-### 5. Kiểm tra build
-
-Backend:
-
-```powershell
-cd backend
-./mvnw.cmd -DskipTests compile
-```
-
-Frontend:
-
-```powershell
-cd frontend
-npm run build
-npm run lint
-```
 
 ## Tài liệu bổ sung
 

@@ -36,13 +36,14 @@ public class HomeroomAssignmentController {
     private final SchoolClassService schoolClassService;
     private final GradeService gradeService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin/homeroom-assignments")
     public ResponseEntity<ApiResponse<List<HomeroomAssignmentResponse>>> assignTeacher(
             @Valid @RequestBody BulkHomeroomAssignmentRequest request) {
         homeroomAssignmentService.bulkSaveHomeroomAssignments(request);
         return ResponseEntity.ok(new ApiResponse<>("Phân công giáo viên chủ nhiệm thành công"));
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/admin/homeroom-assignments/{id}/end")
     public ResponseEntity<ApiResponse<Void>> endAssignment(@PathVariable Long id) {
         homeroomAssignmentService.endHomeroomAssignment(id);

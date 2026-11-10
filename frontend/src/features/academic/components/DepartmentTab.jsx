@@ -18,8 +18,8 @@ const DepartmentTab = () => {
     try {
       const res = await departmentApi.getDepartments();
       setData(res.data?.data || []);
-    } catch  {
-      message.error('Lỗi khi tải danh sách tổ bộ môn!');
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Lỗi khi tải danh sách tổ bộ môn!');
     } finally {
       setLoading(false);
     }

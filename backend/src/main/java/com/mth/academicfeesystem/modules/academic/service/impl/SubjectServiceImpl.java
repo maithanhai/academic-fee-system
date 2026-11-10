@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.mth.academicfeesystem.common.exception.DuplicateResourceException;
 import com.mth.academicfeesystem.common.exception.ResourceNotFoundException;
@@ -14,7 +15,6 @@ import com.mth.academicfeesystem.modules.academic.mapper.SubjectMapper;
 import com.mth.academicfeesystem.modules.academic.repository.SubjectRepository;
 import com.mth.academicfeesystem.modules.academic.service.SubjectService;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
@@ -26,7 +26,7 @@ public class SubjectServiceImpl implements SubjectService {
     public List<SubjectResponse> getAllSubjects(){
         return subjectMapper.toResponseList(subjectRepo.findAll(Sort.by(Sort.Direction.DESC, "id")));
     }
-    @Transactional
+    @Transactional 
     @Override
     public SubjectResponse addSubject(SubjectRequest request){
         Subject subject = new Subject();

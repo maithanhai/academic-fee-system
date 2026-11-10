@@ -1,6 +1,7 @@
 package com.mth.academicfeesystem.modules.academic.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -16,6 +17,8 @@ public interface SchoolClassRepository extends JpaRepository<SchoolClass, Long>,
 
     List<SchoolClass> findByAcademicYearId(Long academicYearId);
 
+    Optional<SchoolClass> findByAcademicYearIdAndName(Long academicYearId, String name);
+
     List<SchoolClass> findByGradeLevel(Integer gradeLevel);
 
     @Query("SELECT ce.schoolClass.id, COUNT(ce.id) " +
@@ -30,12 +33,9 @@ public interface SchoolClassRepository extends JpaRepository<SchoolClass, Long>,
     List<Object[]> countHistoricalStudentsByClassIds(@Param("classIds") List<Long> classIds);
 
     @Query("SELECT ce.schoolClass.id, COUNT(ce.id) " +
-           "FROM ClassEnrollment ce " +
-           "WHERE ce.schoolClass.id IN :classIds " +
-           "AND ( " +
-           "    (ce.schoolClass.academicYear.active = true AND ce.status = 'ACTIVE') " +
-           " OR (ce.schoolClass.academicYear.active = false) " +
-           ") " +
-           "GROUP BY ce.schoolClass.id")
+            "FROM ClassEnrollment ce " +
+            "WHERE ce.schoolClass.id IN :classIds " +
+            "AND ce.status = 'ACTIVE' " +
+            "GROUP BY ce.schoolClass.id")
     List<Object[]> countStudentsByClassIds(@Param("classIds") List<Long> classIds);
 }

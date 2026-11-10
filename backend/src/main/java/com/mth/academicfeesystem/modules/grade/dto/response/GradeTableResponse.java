@@ -29,7 +29,8 @@ public record GradeTableResponse(
         public record GradeDetailResponse(
                 Long gradeId,
                 Double score,
-                Integer ordinalNumber) {
+                Integer ordinalNumber,
+                String examType) {
         }
     }
 }

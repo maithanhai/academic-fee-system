@@ -43,12 +43,6 @@ public class SchoolClassController {
         return ResponseEntity.ok(new ApiResponse<>("Tạo lớp mới thành công", response));
     }
 
-    @PostMapping("/classes/auto-promote")
-    public ResponseEntity<ApiResponse<?>> autoPromote() {
-        schoolClassService.autoPromoteStudents();
-        return ResponseEntity.ok(new ApiResponse<>("Successful"));
-    }
-
     @GetMapping("/classes/academic-years/{academicYearId}/total")
     public ResponseEntity<ApiResponse<List<SchoolClassListResponse>>> getListClassesByAcademicYearId(
         @PathVariable Long academicYearId
@@ -63,6 +57,14 @@ public class SchoolClassController {
     ){
         List<StudentShortListResponse> responses = schoolClassService.getStudentsByClassId(classId);
         return ResponseEntity.ok(new ApiResponse<>("Lấy danh sách học sinh theo lớp thành công",responses));
+    }
+
+    @PostMapping("/classes/{classId}/auto-promote")
+    public ResponseEntity<ApiResponse<?>> autoPromote(
+        @PathVariable Long classId
+    ){
+        schoolClassService.autoPromoteStudentsByClassId(classId);
+        return ResponseEntity.ok(new ApiResponse<>("Lên lớp thành công"));
     }
 
 }

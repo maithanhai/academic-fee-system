@@ -16,7 +16,6 @@ import com.mth.academicfeesystem.modules.people.dto.request.StudentAdminUpdateRe
 import com.mth.academicfeesystem.modules.people.dto.response.StudentDetailResponse;
 import com.mth.academicfeesystem.modules.people.dto.response.StudentResponse;
 import com.mth.academicfeesystem.modules.people.entity.Student;
-import com.mth.academicfeesystem.modules.user.dto.request.RegisterStudentRequest;
 
 
 @Mapper(componentModel = "spring",

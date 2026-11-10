@@ -40,8 +40,8 @@ export const useInvoiceManagement = () => {
       const { data, totalElements } = response.data.data;
       setInvoices(data);
       setInvoicePagination({ current: page, pageSize, total: totalElements });
-    } catch {
-      message.error("Lỗi khi tải danh sách hóa đơn");
+    } catch (error) {
+      message.error(error.response?.data?.message || "Lỗi khi tải danh sách hóa đơn");
     } finally {
       setInvoiceLoading(false);
     }
@@ -111,8 +111,8 @@ export const useInvoiceManagement = () => {
     try {
       const response = await feeInvoiceApi.getInvoiceById(id);
       setInvoiceDetail(response.data.data);
-    } catch {
-      message.error("Lỗi tải dữ liệu");
+    } catch (error) {
+      message.error(error.response?.data?.message || "Lỗi tải dữ liệu");
       setDrawerVisible(false);
     } finally {
       setDetailLoading(false);

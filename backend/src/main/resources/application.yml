@@ -2,22 +2,19 @@ server:
   port: 8080
 
 spring:
-  config:
-    import: optional:dotenv:./.env
-
   application:
     name: academic-fee-system
 
   datasource:
-    url: jdbc:mysql://localhost:3306/academic_fee_system?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Ho_Chi_Minh&createDatabaseIfNotExist=true
-    username: root
+    url: ${DB_URL:jdbc:mysql://localhost:3306/academic_fee_system}
+    username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:123456}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update        # đang giai đoạn code entity -> để Hibernate tự tạo/cập nhật bảng
-                               # ⚠️ trước khi hoàn thiện đồ án: đổi sang 'validate' + chuyển hẳn sang Flyway
+      ddl-auto: update
+
     show-sql: true
     properties:
       hibernate:
@@ -57,8 +54,8 @@ spring:
 
 jwt:
   secret: ${JWT_SECRET:academic-fee-system-secret-key-change-in-production-min-256-bit}
-  expiration: 86400000            # 24h 
-  refresh-expiration: 604800000   # 7 ngày 
+  expiration: 43200000 # 12h
+  refresh-expiration: 604800000 # 7 ngày
 
 springdoc:
   api-docs:

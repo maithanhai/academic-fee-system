@@ -33,33 +33,30 @@ public class AuditAspect {
 
     @Around("@annotation(auditable)")
     public Object logAction(ProceedingJoinPoint joinPoint, Auditable auditable) throws Throwable {
-        Object beforeData = AuditContext.getBefore();
         try {
             Object result = joinPoint.proceed();
-            Map<String, Object> payloadMap = new LinkedHashMap<>();
-            payloadMap.put("before", beforeData);
-            payloadMap.put("after", result);
-            auditLogService.save(
-                    getCurrentUserId(),
-                    auditable.action(),
-                    auditable.targetTable(),
-                    toJson(payloadMap),
-                    getClientIp());
+            saveAuditLog(auditable, "after", result);
             return result;
         } catch (Exception ex) {
-            Map<String, Object> payloadMap = new LinkedHashMap<>();
-            payloadMap.put("before", beforeData);
-            payloadMap.put("error", ex.getMessage());
-            auditLogService.save(
-                    getCurrentUserId(),
-                    auditable.action(),
-                    auditable.targetTable(),
-                    toJson(payloadMap),
-                    getClientIp());
+            saveAuditLog(auditable, "error", ex.getMessage());
             throw ex;
         } finally {
             AuditContext.clear();
         }
+    }
+
+    private void saveAuditLog(Auditable auditable, String resultKey, Object resultValue) {
+        Map<String, Object> payloadMap = new LinkedHashMap<>();
+        payloadMap.put("before", AuditContext.getBefore());
+        payloadMap.put(resultKey, resultValue);
+
+        auditLogService.save(
+                getCurrentUserId(),
+                auditable.action(),
+                auditable.targetTable(),
+                toJson(payloadMap),
+                getClientIp()
+        );
     }
 
     private Long getCurrentUserId() {

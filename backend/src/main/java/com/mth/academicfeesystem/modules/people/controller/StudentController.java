@@ -43,6 +43,7 @@ public class StudentController {
         return ResponseEntity.ok(new ApiResponse<>("Cập nhật thông tin học sinh thành công",response));
     }
 
+    @PreAuthorize ("hasRole('ADMIN')")
     @PutMapping("/admin/students/{id}/reset-password")
     public ResponseEntity<ApiResponse<?>> resetPassword(
         @PathVariable Long id
@@ -51,6 +52,7 @@ public class StudentController {
         return ResponseEntity.ok(new ApiResponse<>("Reset password successful"));
     }
 
+    @PreAuthorize ("hasRole('ADMIN')")
     @PostMapping(value = "/admin/students/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<ImportStudentsResult>> importStudents(
         @RequestParam("file") MultipartFile file,
@@ -64,6 +66,7 @@ public class StudentController {
                 result));
     }
 
+    @PreAuthorize ("hasRole('ADMIN')")
     @PostMapping("/admin/students")
     public ResponseEntity<ApiResponse<?>> registerStudent(
         @Valid @RequestBody RegisterStudentRequest request
@@ -72,6 +75,7 @@ public class StudentController {
         return ResponseEntity.ok(new ApiResponse<>("Tạo tài khoản cho học sinh thành công"));
     }
 
+    @PreAuthorize ("hasRole('ADMIN')")
     @GetMapping("/admin/students/unenrollments")
     public ResponseEntity<ApiResponse<List<StudentResponse>>> getStudentsUnenrolled(
         @RequestParam Long academicYearId

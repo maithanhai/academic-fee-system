@@ -24,7 +24,7 @@ const useProfile = () => {
           phoneParent: profileData.phoneParent,
         });
       })
-      .catch(() => message.error('Không lấy được thông tin cá nhân!'))
+      .catch((error) => message.error(error.response?.data?.message || 'Không lấy được thông tin cá nhân!'))
       .finally(() => setLoading(false));
   }, [form]);
 
@@ -33,8 +33,8 @@ const useProfile = () => {
     try {
       await userApi.updateProfile(values);
       message.success('Cập nhật thông tin thành công!');
-    } catch {
-      message.error('Lỗi khi cập nhật thông tin!');
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Lỗi khi cập nhật thông tin!');
     } finally {
       setUpdating(false);
     }

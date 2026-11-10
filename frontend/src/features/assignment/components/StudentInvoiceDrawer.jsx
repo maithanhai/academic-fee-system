@@ -43,8 +43,8 @@ const StudentInvoiceDrawer = ({
         academicYearId
       );
       setInvoices(res.data?.data || []);
-    } catch {
-      message.error("Lỗi khi tải danh sách khoản phí");
+    } catch (error) {
+      message.error(error.response?.data?.message || "Lỗi khi tải danh sách khoản phí");
     } finally {
       setLoading(false);
     }

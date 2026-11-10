@@ -62,11 +62,25 @@ Tài liệu này được đối chiếu với các controller hiện tại. T�
 | PUT | `/api/admin/subjects/{id}` | ADMIN | Cập nhật môn học |
 | GET | `/api/classes` | Authenticated | Danh sách lớp theo bộ lọc |
 | POST | `/api/classes` | Authenticated | Tạo lớp theo controller hiện tại |
-| POST | `/api/classes/auto-promote` | Authenticated | Tự động lên lớp |
+| POST | `/api/admin/classes/{classId}/auto-promote` | ADMIN | Lên lớp tự động cho một lớp đã kết thúc năm học |
 | GET | `/api/classes/academic-years/{academicYearId}/total` | Authenticated | Tổng hợp số lớp theo năm học |
 | GET | `/api/classes/{classId}/students` | Authenticated | Danh sách học sinh của lớp |
 | POST | `/api/admin/class-enrollments` | ADMIN | Import/xếp học sinh vào lớp |
 | POST | `/api/admin/class-enrollments/transfer` | ADMIN | Chuyển học sinh sang lớp khác |
+
+### Quy tắc endpoint lên lớp
+
+`POST /api/admin/classes/{classId}/auto-promote` xử lý một lớp trong mỗi lần gọi. Frontend chỉ điều khiển việc hiển thị nút; backend luôn kiểm tra lại toàn bộ điều kiện:
+
+- Lớp nguồn phải tồn tại và thuộc năm học đã đóng.
+- Chỉ lớp khối 10 hoặc 11 được lên lớp; khối 12 không có lớp đích.
+- Năm học kế tiếp phải tồn tại và đang mở.
+- Lớp đích tương ứng phải được admin tạo trước, ví dụ `10A1` sang `11A1`.
+- Enrollment nguồn phải có trạng thái `DROPPED`.
+- Không được tạo enrollment trùng nếu học sinh đã có enrollment `ACTIVE` trong lớp đích.
+- Toàn bộ thao tác chạy trong một transaction; nếu điều kiện không hợp lệ hoặc có lỗi thì không chuyển một phần dữ liệu.
+
+Khi thành công, enrollment cũ được giữ lại với trạng thái `DROPPED` để bảo toàn lịch sử và tạo enrollment mới ở lớp đích với trạng thái `ACTIVE`. Endpoint không tự tạo lớp đích và không xử lý bulk toàn bộ năm học.
 
 ## 4. Phân công giáo viên
 

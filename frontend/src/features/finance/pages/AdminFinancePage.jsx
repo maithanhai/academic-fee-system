@@ -15,7 +15,7 @@ const AdminFinancePage = () => {
   };
 
   return (
-    <Card variant={false} title={<Title level={3} style={{ margin: 0 }}>Quản lý Tài chính</Title>}>
+    <Card variant={false} title={<Title level={3} style={{ margin: 0 }}>Quản lý tài chính</Title>}>
       <Tabs
         activeKey={activeTab}
         onChange={setActiveTab}
