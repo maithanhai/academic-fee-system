@@ -28,8 +28,8 @@ const TeacherHomeroomAssignmentPage = () => {
         const activeYear = years.find(y => y.active) || years[0];
         setSelectedYearId(activeYear.id);
       }
-    } catch {
-      message.error("Lỗi khi tải dữ liệu trang chủ nhiệm");
+    } catch (error) {
+      message.error(error.response?.data?.message || "Lỗi khi tải dữ liệu trang chủ nhiệm");
     } finally {
       setLoading(false);
     }

@@ -17,10 +17,16 @@ public interface ClassEnrollmentRepository extends JpaRepository<ClassEnrollment
 
         Optional<ClassEnrollment> findByStudentIdAndStatus(Long studentId, EnrollmentStatus status);
 
+        boolean existsByStudentIdAndSchoolClassAcademicYearIdAndStatus(
+                        Long studentId, Long academicYearId, EnrollmentStatus status);
+
         @EntityGraph(attributePaths = { "student", "student.user" })
         List<ClassEnrollment> findBySchoolClassIdAndStatus(Long classId, EnrollmentStatus status);
 
         Boolean existsBySchoolClassIdAndStudentId(Long schoolClassId, Long studentId);
+
+        boolean existsBySchoolClassIdAndStudentIdAndStatus(
+                        Long schoolClassId, Long studentId, EnrollmentStatus status);
 
         @EntityGraph(attributePaths = { "student", "student.user" })
         List<ClassEnrollment> findBySchoolClassId(Long classId);

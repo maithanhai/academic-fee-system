@@ -45,13 +45,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TeacherServiceImpl implements TeacherService {
     private final TeacherRepository teacherRepo;
+    private final TeacherExpertiseRepository teacherExpertiseRepo;
     private final TeacherMapper teacherMapper;
     private final UserRepository userRepo;
     private final UserMapper userMapper;
     private final DepartmentRepository departmentRepo;
     private final SubjectRepository subjectRepo;
     private final PasswordEncoder passwordEncoder;
-    private final TeacherExpertiseRepository teacherExpertiseRepo;
 
     @Override
     public List<TeacherResponse> getActiveTeachers() {
@@ -105,35 +105,46 @@ public class TeacherServiceImpl implements TeacherService {
     @Override
     public TeacherDetailResponse updateTeacher(Long userId, TeacherAdminUpdateRequest request) {
         Teacher teacher = teacherRepo.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Teacher not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Giáo viên không tồn tại"));
         User user = teacher.getUser();
         userMapper.toEntity(request, user);
         userRepo.save(user);
 
-        if (request.getDepartmentId() != null && !request.getDepartmentId().equals(teacher.getDepartment().getId())) {
+        if (request.getDepartmentId() != null) {
             Department department = departmentRepo.findById(request.getDepartmentId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Department not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Chuyên môn không tồn tại"));
             teacher.setDepartment(department);
-            teacherRepo.save(teacher);
         }
+        teacherRepo.save(teacher);
 
         if (request.getSubjectIds() != null) {
-            teacher.getExpertises().removeIf(exp -> !request.getSubjectIds().contains(exp.getSubject().getId()));
-            List<Long> existingIds = teacher.getExpertises().stream()
+            List<TeacherExpertise> currentExpertises = teacher.getExpertises();
+            List<TeacherExpertise> removedExpertises = currentExpertises.stream()
+                    .filter(exp -> !request.getSubjectIds().contains(exp.getSubject().getId()))
+                    .toList();
+            if (!removedExpertises.isEmpty()) {
+                teacherExpertiseRepo.deleteAll(removedExpertises);
+                currentExpertises.removeAll(removedExpertises);
+            }
+
+            List<Long> existingIds = currentExpertises.stream()
                     .map(exp -> exp.getSubject().getId())
                     .toList();
+            List<TeacherExpertise> newExpertises = new ArrayList<>();
             for (Long subjectId : request.getSubjectIds()) {
                 if (!existingIds.contains(subjectId)) {
                     Subject subject = subjectRepo.findById(subjectId)
-                            .orElseThrow(() -> new ResourceNotFoundException("Subject not found: " + subjectId));
-
+                            .orElseThrow(() -> new ResourceNotFoundException("Môn học không tồn tại với ID: " + subjectId));
                     TeacherExpertise expertise = TeacherExpertise.builder()
                             .teacher(teacher)
                             .subject(subject)
                             .build();
-
-                    teacher.getExpertises().add(expertise);
+                    newExpertises.add(expertise);
                 }
+            }
+            if (!newExpertises.isEmpty()) {
+                teacherExpertiseRepo.saveAll(newExpertises);
+                currentExpertises.addAll(newExpertises);
             }
         }
         return teacherMapper.toDetailResponse(teacher);

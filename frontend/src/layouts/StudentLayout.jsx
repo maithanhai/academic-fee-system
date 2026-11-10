@@ -1,9 +1,23 @@
 import {
-UserOutlined,LogoutOutlined,NotificationOutlined,DownOutlined,IdcardOutlined,KeyOutlined,
-ProfileOutlined,
-CreditCardOutlined,
+  UserOutlined,
+  LogoutOutlined,
+  NotificationOutlined,
+  DownOutlined,
+  IdcardOutlined,
+  KeyOutlined,
+  ProfileOutlined,
+  CreditCardOutlined,
 } from "@ant-design/icons";
-import { Layout, Menu, theme, Typography, Space, message, Dropdown, Avatar } from "antd";
+import {
+  Layout,
+  Menu,
+  theme,
+  Typography,
+  Space,
+  message,
+  Dropdown,
+  Avatar,
+} from "antd";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../app/store/slices/authSlice";
@@ -13,7 +27,9 @@ const { Header, Content, Footer, Sider } = Layout;
 const { Text } = Typography;
 
 const StudentLayout = () => {
-  const {token: { colorBgContainer, borderRadiusLG }} = theme.useToken();
+  const {
+    token: { colorBgContainer, borderRadiusLG },
+  } = theme.useToken();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -22,9 +38,17 @@ const StudentLayout = () => {
   const { fullname, username } = useSelector((state) => state.auth);
 
   const menuItems = [
-    { key: "/student/notifications", icon: <NotificationOutlined />, label: "Thông báo" },
+    {
+      key: "/student/notifications",
+      icon: <NotificationOutlined />,
+      label: "Thông báo",
+    },
     { key: "/student/grades", icon: <ProfileOutlined />, label: "Bảng điểm" },
-    { key: "/student/fees", icon: <CreditCardOutlined />, label: "Các đợt thu phí" },
+    {
+      key: "/student/fees",
+      icon: <CreditCardOutlined />,
+      label: "Các đợt thu phí",
+    },
   ];
 
   const userMenuItems = [
@@ -32,7 +56,9 @@ const StudentLayout = () => {
       key: "info",
       label: (
         <div style={{ padding: "4px 0", minWidth: "160px" }}>
-          <div style={{ fontWeight: "bold", fontSize: "14px", color: "#1f1f1f" }}>
+          <div
+            style={{ fontWeight: "bold", fontSize: "14px", color: "#1f1f1f" }}
+          >
             {fullname || "Giáo viên"}
           </div>
           <div style={{ color: "#8c8c8c", fontSize: "12px", marginTop: "2px" }}>
@@ -43,10 +69,23 @@ const StudentLayout = () => {
       disabled: true,
     },
     { type: "divider" },
-    { key: "/student/profile", icon: <IdcardOutlined />, label: "Thông tin cá nhân" },
-    { key: "/student/change-password", icon: <KeyOutlined />, label: "Đổi mật khẩu" },
+    {
+      key: "/student/profile",
+      icon: <IdcardOutlined />,
+      label: "Thông tin cá nhân",
+    },
+    {
+      key: "/student/change-password",
+      icon: <KeyOutlined />,
+      label: "Đổi mật khẩu",
+    },
     { type: "divider" },
-    { key: "logout", icon: <LogoutOutlined />, label: "Đăng xuất", danger: true },
+    {
+      key: "logout",
+      icon: <LogoutOutlined />,
+      label: "Đăng xuất",
+      danger: true,
+    },
   ];
 
   const handleMenuClick = ({ key }) => {
@@ -59,8 +98,8 @@ const StudentLayout = () => {
       dispatch(logout());
       message.success("Đăng xuất thành công!");
       navigate("/login");
-    } catch {
-      message.error("Lỗi khi đăng xuất!");
+    } catch (error) {
+      message.error(error.response?.data?.message || "Lỗi khi đăng xuất!");
     }
   };
 
@@ -80,11 +119,11 @@ const StudentLayout = () => {
         onBreakpoint={(broken) => console.log(broken)}
         onCollapse={(collapsed, type) => console.log(collapsed, type)}
         style={{
-          overflow: "auto",    
-          height: "100vh",       
-          position: "sticky",   
-          insetInlineStart: 0,   
-          top: 0,               
+          overflow: "auto",
+          height: "100vh",
+          position: "sticky",
+          insetInlineStart: 0,
+          top: 0,
           scrollbarWidth: "thin",
           scrollbarGutter: "stable",
         }}
@@ -129,7 +168,7 @@ const StudentLayout = () => {
             <Space style={{ cursor: "pointer", padding: "0 8px" }}>
               <Avatar
                 icon={<UserOutlined />}
-                style={{ backgroundColor: "#1677ff" }} 
+                style={{ backgroundColor: "#1677ff" }}
               />
               <Text strong style={{ fontSize: "14px" }}>
                 {fullname || "Học sinh"}

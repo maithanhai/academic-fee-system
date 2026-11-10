@@ -105,6 +105,14 @@ Schema dưới đây được suy ra từ các entity JPA hiện tại. Hibernat
 | `class_id` | FK tới `classes`, bắt buộc |
 | `student_id` | FK tới `students`, bắt buộc |
 
+### Vòng đời enrollment khi kết thúc năm học và lên lớp
+
+- Khi admin đóng năm học, các enrollment `ACTIVE` của năm đó được chuyển thành `DROPPED` và ghi `end_date`.
+- Khi admin bấm lên lớp cho một lớp cụ thể, backend tìm lớp đích đã tồn tại trong năm học kế tiếp.
+- Enrollment cũ được giữ nguyên là `DROPPED`; hệ thống tạo enrollment mới ở lớp đích với trạng thái `ACTIVE`.
+- Lớp khối 12 không được lên lớp tự động.
+- Nếu thiếu năm học đích, thiếu lớp đích hoặc phát hiện enrollment đã tồn tại ở lớp đích, transaction bị từ chối và không xử lý dở dang.
+
 ## 3. Phân công
 
 ### `homeroom_assignments`
@@ -179,7 +187,18 @@ Constraint unique của `Grade` cần được đối chiếu trực tiếp vớ
 
 Unique constraint `uk_fee_invoice_student_fee` trên `(student_id, fee_id)`.
 
-## 6. Thông báo và audit
+## 6. Luồng lên lớp
+
+Lên lớp là thao tác độc lập với việc tạo lớp và kết thúc năm học:
+
+1. Admin kết thúc năm học, làm các enrollment đang hoạt động thành `DROPPED`.
+2. Admin tạo các lớp của năm học mới trong quản lý lớp.
+3. Admin gọi `POST /api/admin/classes/{classId}/auto-promote` cho từng lớp khối 10 hoặc 11.
+4. Backend kiểm tra lớp đích và tạo enrollment `ACTIVE` cho học sinh.
+
+Endpoint chỉ chuyển học sinh vào lớp đích đã tồn tại; không tự sinh lớp và không lên lớp bulk toàn bộ năm học.
+
+## 7. Thông báo và audit
 
 ### `notifications`
 
@@ -199,6 +218,6 @@ Entity hiện tại dùng bảng `notifications`, gồm nội dung, trạng thá
 
 Audit log hiện được tạo bởi Spring AOP với annotation `@Auditable` trên các nghiệp vụ nhạy cảm đã đánh dấu.
 
-## 7. Cấu hình phát triển
+## 8. Cấu hình phát triển
 
 Hiện tại `application.yml` dùng MySQL database `academic_fee_system` và `ddl-auto: update`. Trước khi triển khai production nên chuyển sang `validate` và dùng Flyway hoặc Liquibase để kiểm soát schema.

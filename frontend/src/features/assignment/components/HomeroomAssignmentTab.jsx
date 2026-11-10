@@ -53,8 +53,8 @@ const HomeroomAssignmentTab = () => {
             : "Không xác định",
         }));
         setActiveTeachers(teacherOptions);
-      } catch {
-        message.error("Lỗi tải dữ liệu ban đầu!");
+      } catch (error) {
+        message.error(error.response?.data?.message || "Thao tác thất bại");
       }
     };
     fetchInitialData();
@@ -68,22 +68,22 @@ const HomeroomAssignmentTab = () => {
       try {
         const [classRes, assignRes] = await Promise.all([
           academicYearApi.getClassesByAcademicYearId(selectedYearId),
-          homeroomAssigntmentApi.getExistingAssignments(selectedYearId)
+          homeroomAssigntmentApi.getExistingAssignments(selectedYearId),
         ]);
         const classData = classRes.data?.data || [];
         setClasses(classData);
         const existingData = assignRes.data?.data || [];
         const loadedAssignments = {};
-        
+
         existingData.forEach((item) => {
           loadedAssignments[item.classId] = {
-            assignmentId: item.id, 
+            assignmentId: item.id,
             teacherId: item.teacherId,
           };
         });
         setAssignments(loadedAssignments);
-      } catch {
-        message.error("Lỗi tải dữ liệu!");
+      } catch (error) {
+        message.error(error.response?.data?.message || "Lỗi tải dữ liệu!");
       } finally {
         setLoading(false);
       }
@@ -107,7 +107,7 @@ const HomeroomAssignmentTab = () => {
 
     const finalPayload = {
       academicYearId: selectedYearId,
-      assignments: assignmentList
+      assignments: assignmentList,
     };
 
     setSaving(true);
@@ -154,7 +154,9 @@ const HomeroomAssignmentTab = () => {
         const currentTeacherId = cellData?.teacherId;
 
         const availableTeacherOptions = activeTeachers.filter(
-          (t) => !allAssignedTeacherIds.includes(t.value) || t.value === currentTeacherId
+          (t) =>
+            !allAssignedTeacherIds.includes(t.value) ||
+            t.value === currentTeacherId,
         );
 
         return (
@@ -165,15 +167,13 @@ const HomeroomAssignmentTab = () => {
             options={availableTeacherOptions}
             allowClear
             disabled={isYearLocked}
-            
             showSearch={{
               filterOption: (input, option) => {
                 const searchInput = normalizeString(input);
                 const optionLabel = normalizeString(option?.label);
                 return optionLabel.includes(searchInput);
-              }
+              },
             }}
-
             onChange={(val, option) => {
               setAssignments((prev) => ({
                 ...prev,

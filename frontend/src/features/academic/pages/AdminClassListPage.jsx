@@ -33,6 +33,7 @@ const AdminClassListPage = () => {
   const [selectedGrade, setSelectedGrade] = useState("ALL");
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [promotingClassId, setPromotingClassId] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [formAdd] = Form.useForm();
   const fetchAcademicYears = useCallback(async () => {
@@ -43,8 +44,8 @@ const AdminClassListPage = () => {
       if (years.length > 0) {
         setSelectedYearId(years[0].id);
       }
-    } catch {
-      message.error("Lỗi khi tải danh sách năm học");
+    } catch (error) {
+      message.error(error.response?.data?.message || "Thao tác thất bại");
     }
   }, []);
 
@@ -58,8 +59,8 @@ const AdminClassListPage = () => {
       setLoading(true);
       const res = await classApi.getClassesByAcademicYearId(selectedYearId);
       setClasses(res.data.data || []);
-    } catch {
-      message.error("Lỗi khi tải danh sách lớp học");
+    } catch (error) {
+      message.error(error.response?.data?.message || "Lỗi khi tải danh sách lớp học");
     } finally {
       setLoading(false);
     }
@@ -80,9 +81,34 @@ const AdminClassListPage = () => {
       setIsAddModalOpen(false);
       formAdd.resetFields();
       fetchClasses();
-    } catch {
-      message.error("Lỗi khi tạo lớp học");
+    } catch (error) {
+      message.error(error.response?.data?.message || "Lỗi khi tạo lớp học");
     }
+  };
+
+  const handleAutoPromote = (record) => {
+    Modal.confirm({
+      title: `Lên lớp tự động cho ${record.name}?`,
+      content:
+        "Hệ thống sẽ chuyển học sinh sang lớp đích đã được tạo trong năm học kế tiếp.",
+      okText: "Lên lớp",
+      cancelText: "Hủy",
+      onOk: async () => {
+        try {
+          setPromotingClassId(record.id);
+          await classApi.autoPromote(record.id);
+          message.success(`Lên lớp cho ${record.name} thành công`);
+          await fetchClasses();
+        } catch (error) {
+          message.error(
+            error.response?.data?.message ||
+              `Không thể lên lớp cho ${record.name}`,
+          );
+        } finally {
+          setPromotingClassId(null);
+        }
+      },
+    });
   };
 
   const displayClasses =
@@ -101,16 +127,29 @@ const AdminClassListPage = () => {
       title: "Thao tác",
       key: "action",
       render: (_, record) => (
-        <Button
-          size="small"
-          onClick={() => {
-            navigate(`/admin/classes/${record.id}/students`, {
-              state: { academicYearId: selectedYearId }, 
-            });
-          }}
-        >
-          Chi tiết
-        </Button>
+        <Space>
+          <Button
+            size="small"
+            onClick={() => {
+              navigate(`/admin/classes/${record.id}/students`, {
+                state: { academicYearId: selectedYearId },
+              });
+            }}
+          >
+            Chi tiết
+          </Button>
+          {isYearLocked && [10, 11].includes(record.gradeLevel) && (
+            <Button
+              size="small"
+              type="primary"
+              loading={promotingClassId === record.id}
+              disabled={promotingClassId !== null}
+              onClick={() => handleAutoPromote(record)}
+            >
+              Lên lớp tự động
+            </Button>
+          )}
+        </Space>
       ),
     },
   ];

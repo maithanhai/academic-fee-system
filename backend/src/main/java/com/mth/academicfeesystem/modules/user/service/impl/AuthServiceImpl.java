@@ -10,6 +10,7 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.mth.academicfeesystem.common.exception.BusinessException;
 import com.mth.academicfeesystem.common.exception.ResourceNotFoundException;
@@ -23,7 +24,6 @@ import com.mth.academicfeesystem.modules.user.service.AuthService;
 import com.mth.academicfeesystem.security.CustomUserPrincipal;
 import com.mth.academicfeesystem.security.JwtTokenProvider;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -74,11 +74,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
 
-    @Transactional
+    @Transactional 
     @Override
     public LoginResponse refreshToken(RefreshTokenRequest request) {
         String refreshToken = request.refreshToken();
-        if (!jwtTokenProvider.validateToken(refreshToken)) {
+        if (!jwtTokenProvider.validateToken(refreshToken)
+                || !jwtTokenProvider.isRefreshToken(refreshToken)) {
             throw new BusinessException("Refresh token không hợp lệ hoặc hết hạn");
         }
         RefreshToken refreshTokenEntity = refreshTokenRepo.findByToken(refreshToken)
@@ -86,13 +87,20 @@ public class AuthServiceImpl implements AuthService {
         if (refreshTokenEntity.isRevoked()) {
             throw new BusinessException("Refresh token đã bị thu hồi. Vui lòng đăng nhập lại");
         }
+        if (refreshTokenEntity.getExpiryDate().isBefore(Instant.now())) {
+            throw new BusinessException("Refresh token đã hết hạn. Vui lòng đăng nhập lại");
+        }
         User user = refreshTokenEntity.getUser();
+        if (!user.isActive()) {
+            throw new BusinessException("Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên");
+        }
 
         String newAccessToken = jwtTokenProvider.generateAccessToken(user.getId(), user.getUsername(),
                 user.getRole().name());
         String newRefreshTokenString = jwtTokenProvider.generateRefreshToken(user.getId(), user.getUsername());
 
-        refreshTokenRepo.delete(refreshTokenEntity);
+        refreshTokenEntity.setRevoked(true);
+        refreshTokenRepo.save(refreshTokenEntity);
         RefreshToken newRefreshTokenEntity = RefreshToken.builder()
                 .token(newRefreshTokenString)
                 .expiryDate(Instant.now().plusMillis(refreshExpiration))
@@ -116,7 +124,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(String refreshToken) {
         refreshTokenRepo.findByToken(refreshToken).ifPresent(token -> {
-            refreshTokenRepo.delete(token);
+            token.setRevoked(true);
+            refreshTokenRepo.save(token);
         });
     }
 }

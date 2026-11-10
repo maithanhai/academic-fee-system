@@ -8,6 +8,6 @@ public record BulkHomeroomAssignmentRequest(
                 Long academicYearId, List<HomeroomAssignmentRequest> assignments) {
         public record HomeroomAssignmentRequest(
                         @NotNull(message = "ID class not null") Long classId,
-                        @NotNull(message = "ID teacher not null") Long teacherId) {
+                        Long teacherId) {
         }
 }

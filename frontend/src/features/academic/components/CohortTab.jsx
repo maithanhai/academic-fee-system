@@ -15,8 +15,8 @@ const CohortTab = () => {
     try {
       const res = await cohortApi.getCohorts();
       setData(res.data?.data || []);
-    } catch {
-      message.error("Lỗi khi tải danh sách khóa học!");
+    } catch (error) {
+      message.error(error.response?.data?.message || "Lỗi khi tải danh sách khóa học!");
     } finally {
       setLoading(false);
     }

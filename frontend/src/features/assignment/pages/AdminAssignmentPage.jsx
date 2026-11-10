@@ -9,7 +9,7 @@ const AdminAssignmentPage = () => {
   const [activeTab, setActiveTab] = useState('teaching');
 
   return (
-    <Card variant={false} title={<Title level={3} style={{ margin: 0 }}>Quản lý Phân công</Title>}>
+    <Card variant={false} title={<Title level={3} style={{ margin: 0 }}>Quản lý phân công</Title>}>
       <Tabs
         activeKey={activeTab}
         onChange={setActiveTab}

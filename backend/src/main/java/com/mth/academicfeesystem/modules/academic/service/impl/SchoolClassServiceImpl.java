@@ -1,17 +1,16 @@
 package com.mth.academicfeesystem.modules.academic.service.impl;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Set;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.mth.academicfeesystem.common.enums.EnrollmentStatus;
-import com.mth.academicfeesystem.common.exception.DuplicateResourceException;
+import com.mth.academicfeesystem.common.exception.BusinessException;
 import com.mth.academicfeesystem.common.exception.ResourceNotFoundException;
 import com.mth.academicfeesystem.modules.academic.dto.request.SchoolClassRequest;
 import com.mth.academicfeesystem.modules.academic.dto.response.SchoolClassListResponse;
@@ -25,7 +24,6 @@ import com.mth.academicfeesystem.modules.academic.repository.ClassEnrollmentRepo
 import com.mth.academicfeesystem.modules.academic.repository.SchoolClassRepository;
 import com.mth.academicfeesystem.modules.academic.service.SchoolClassService;
 import com.mth.academicfeesystem.modules.people.dto.response.StudentShortListResponse;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -56,77 +54,68 @@ public class SchoolClassServiceImpl implements SchoolClassService {
                 return schoolClassMapper.toResponse(savedClass);
         }
 
-        @Transactional()
-        public void autoPromoteStudents() {
-                int currentYear = LocalDate.now().getYear();
-                String newAcademicYear = currentYear + "-" + (currentYear + 1);
-                String oldAcademicYear = (currentYear - 1) + "-" + currentYear;
+        @Transactional
+        @Override
+        public void autoPromoteStudentsByClassId(Long classId) {
+                SchoolClass oldClass = schoolClassRepo.findById(classId)
+                                .orElseThrow(() -> new ResourceNotFoundException("Lớp học không tồn tại"));
+                AcademicYear oldYear = oldClass.getAcademicYear();
 
-                AcademicYear oldYear = academicYearRepo.findByName(oldAcademicYear)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                "Old academic year not found: " + oldAcademicYear));
-
-                AcademicYear newYear = academicYearRepo.findByName(newAcademicYear)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                "New academic year not exists: " + newAcademicYear));
-
-                if (schoolClassRepo.existsByAcademicYearIdAndGradeLevelIn(newYear.getId(), Arrays.asList(11, 12))) {
-                        throw new DuplicateResourceException(
-                                        "Hệ thống đã thực hiện lên lớp cho năm học " + newAcademicYear + " rồi!");
+                if (Boolean.TRUE.equals(oldYear.getActive())) {
+                        throw new BusinessException("Chỉ được lên lớp sau khi năm học đã kết thúc");
+                }
+                if (oldClass.getGradeLevel() < 10 || oldClass.getGradeLevel() >= 12) {
+                        throw new BusinessException("Chỉ được lên lớp cho lớp khối 10 hoặc 11");
                 }
 
-                List<SchoolClass> oldClasses = schoolClassRepo.findByAcademicYearIdAndGradeLevelIn(oldYear.getId(),
-                                Arrays.asList(10, 11));
-                if (oldClasses.isEmpty()) {
-                        throw new ResourceNotFoundException(
-                                        "Không có lớp Khối 10 hoặc 11 trong năm " + oldAcademicYear + " để lên lớp.");
+                String[] yearParts = oldYear.getName().split("\\s*-\\s*");
+                int oldEndYear = Integer.parseInt(yearParts[1].trim());
+                String newYearName = oldEndYear + "-" + (oldEndYear + 1);
+                AcademicYear newYear = academicYearRepo.findByName(newYearName)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Năm học kế tiếp không tồn tại"));
+                if (!Boolean.TRUE.equals(newYear.getActive())) {
+                        throw new BusinessException("Năm học đích đã đóng, không thể lên lớp");
+                }
+                // kiểm tra khối lớp và tên lớp
+                Integer newGradeLevel = oldClass.getGradeLevel() + 1;
+                String newClassName = oldClass.getName().replaceFirst(
+                                "^" + oldClass.getGradeLevel(), String.valueOf(newGradeLevel));
+                if (newClassName.equals(oldClass.getName())) {
+                        throw new BusinessException("Không xác định được tên lớp đích từ lớp " + oldClass.getName());
+                }
+                // kiểm tra lớp mới
+                SchoolClass newClass = schoolClassRepo.findByAcademicYearIdAndName(newYear.getId(), newClassName)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Chưa tạo lớp đích " + newClassName + " trong năm học " + newYearName));
+                if (!newGradeLevel.equals(newClass.getGradeLevel())) {
+                        throw new BusinessException("Lớp đích không thuộc khối kế tiếp của lớp nguồn");
+                }
+                List<ClassEnrollment> oldEnrollments = classEnrollmentRepo.findBySchoolClassIdAndStatus(
+                                oldClass.getId(), EnrollmentStatus.DROPPED);
+                if (oldEnrollments.isEmpty()) {
+                        throw new ResourceNotFoundException("Lớp không có học sinh đã kết thúc để lên lớp");
                 }
 
-                List<Long> oldClassIds = oldClasses.stream()
-                                .map(schoolClass -> schoolClass.getId())
-                                .collect(Collectors.toList());
+                Set<Long> targetStudentIds = new HashSet<>(classEnrollmentRepo
+                                .findBySchoolClassIdAndStatus(newClass.getId(), EnrollmentStatus.ACTIVE).stream()
+                                .map(enrollment -> enrollment.getStudent().getId())
+                                .toList());
+                boolean alreadyPromoted = oldEnrollments.stream()
+                                .anyMatch(enrollment -> targetStudentIds.contains(enrollment.getStudent().getId()));
+                if (alreadyPromoted) {
+                        throw new BusinessException("Một hoặc nhiều học sinh của lớp đã được lên lớp trước đó");
+                }
 
-                List<ClassEnrollment> allActiveStudents = classEnrollmentRepo.findBySchoolClassIdInAndStatus(
-                                oldClassIds,
-                                EnrollmentStatus.ACTIVE);
-
-                Map<Long, List<ClassEnrollment>> studentsByOldClass = allActiveStudents.stream()
-                                .collect(Collectors.groupingBy(enrollment -> enrollment.getSchoolClass().getId()));
-                List<ClassEnrollment> allEnrollmentsToSave = new ArrayList<>();
-
-                for (SchoolClass oldClass : oldClasses) {
-
-                        Integer newGrade = oldClass.getGradeLevel() + 1;
-                        String newName = oldClass.getName().replaceFirst(
-                                        String.valueOf(oldClass.getGradeLevel()),
-                                        String.valueOf(newGrade));
-
-                        SchoolClass newClass = SchoolClass.builder()
-                                        .name(newName)
-                                        .gradeLevel(newGrade)
-                                        .academicYear(newYear)
-                                        .build();
-
-                        newClass = schoolClassRepo.save(newClass);
-
-                        List<ClassEnrollment> activeStudentsInClass = studentsByOldClass.getOrDefault(oldClass.getId(),
-                                        Collections.emptyList());
-
-                        for (ClassEnrollment oldEnrollment : activeStudentsInClass) {
-                                oldEnrollment.setStatus(EnrollmentStatus.TRANSFERRED);
-                                oldEnrollment.setEndDate(LocalDate.now());
-                                allEnrollmentsToSave.add(oldEnrollment);
-
-                                ClassEnrollment newEnrollment = ClassEnrollment.builder()
+                List<ClassEnrollment> newEnrollments = oldEnrollments.stream()
+                                .map(oldEnrollment -> ClassEnrollment.builder()
                                                 .student(oldEnrollment.getStudent())
                                                 .schoolClass(newClass)
                                                 .status(EnrollmentStatus.ACTIVE)
                                                 .startDate(LocalDate.now())
-                                                .build();
-                                allEnrollmentsToSave.add(newEnrollment);
-                        }
-                }
-                classEnrollmentRepo.saveAll(allEnrollmentsToSave);
+                                                .build())
+                                .toList();
+                classEnrollmentRepo.saveAll(newEnrollments);
         }
 
         @Override
@@ -156,16 +145,10 @@ public class SchoolClassServiceImpl implements SchoolClassService {
 
         @Override
         public List<StudentShortListResponse> getStudentsByClassId(Long classId) {
-                SchoolClass schoolClass = schoolClassRepo.findById(classId)
-                                .orElseThrow(() -> new ResourceNotFoundException("Lớp học không tồn tại"));
-                List<ClassEnrollment> classEnrollments;
-                if (Boolean.TRUE.equals(schoolClass.getAcademicYear().getActive())) {
-                        classEnrollments = classEnrollmentRepo.findBySchoolClassIdAndStatus(classId,
-                                        EnrollmentStatus.ACTIVE);
-                } else {
-                        classEnrollments = classEnrollmentRepo.findBySchoolClassId(classId);
-                }
-
+                if (!schoolClassRepo.existsById(classId))
+                        throw new ResourceNotFoundException("Lớp học không tồn tại");
+                List<ClassEnrollment> classEnrollments = classEnrollmentRepo.findBySchoolClassIdAndStatus(classId,
+                                EnrollmentStatus.ACTIVE);
                 return classEnrollments.stream().map(enrollment -> StudentShortListResponse.builder()
                                 .enrollmentId(enrollment.getId())
                                 .studentId(enrollment.getStudent().getId())

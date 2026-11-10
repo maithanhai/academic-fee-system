@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Past;
 
 public record RegisterStudentRequest(
     @NotBlank String fullName,
-    @NotBlank Gender gender,
+    @NotNull Gender gender,
     @NotNull@Past LocalDate dateOfBirth,
     @NotNull Long cohortId
 ) {}

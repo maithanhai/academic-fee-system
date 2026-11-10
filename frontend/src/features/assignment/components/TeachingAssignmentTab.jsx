@@ -60,8 +60,8 @@ const TeachingAssignmentTab = () => {
         setAcademicYears(years);
         if (years.length > 0) setSelectedYearId(years[0].id);
         setSubjects(subjectRes.data?.data || []);
-      } catch {
-        message.error("Lỗi tải dữ liệu!");
+      } catch (error) {
+        message.error(error.response?.data?.message || "Thao tác thất bại");
       }
     };
     fetchInitialData();
@@ -88,7 +88,7 @@ const TeachingAssignmentTab = () => {
           groupedTeachers[item.subjectId].push({
             value: item.teacher.teacherId,
             label: item.teacher.teacherName,
-            baseWorkload: item.teacher.workload, 
+            baseWorkload: item.teacher.workload,
           });
         });
         setTeachersBySubject(groupedTeachers);
@@ -106,7 +106,8 @@ const TeachingAssignmentTab = () => {
     const fetchExistingAssignments = async () => {
       setLoading(true);
       try {
-        const gradeList = selectedGrade === "ALL" ? [10, 11, 12] : [selectedGrade];
+        const gradeList =
+          selectedGrade === "ALL" ? [10, 11, 12] : [selectedGrade];
         const res = await teachingAssignmentApi.getExistingAssignments(
           selectedYearId,
           gradeList.join(","),
@@ -124,7 +125,7 @@ const TeachingAssignmentTab = () => {
         });
 
         setAssignments(loadedAssignments);
-        setInitialAssignments(loadedAssignments); 
+        setInitialAssignments(loadedAssignments);
       } catch {
         message.error("Lỗi khi tải dữ liệu phân công!");
       } finally {
@@ -137,7 +138,8 @@ const TeachingAssignmentTab = () => {
   const handleCopyAssignmentsPreviousYear = async () => {
     setLoading(true);
     try {
-      const gradeList = selectedGrade === "ALL" ? [10, 11, 12] : [selectedGrade];
+      const gradeList =
+        selectedGrade === "ALL" ? [10, 11, 12] : [selectedGrade];
       const res = await teachingAssignmentApi.copyAssignmentsPreviousYear(
         selectedYearId,
         gradeList.join(","),
@@ -168,7 +170,8 @@ const TeachingAssignmentTab = () => {
   const handleAutoAssign = async () => {
     setLoading(true);
     try {
-      const gradeList = selectedGrade === "ALL" ? [10, 11, 12] : [selectedGrade];
+      const gradeList =
+        selectedGrade === "ALL" ? [10, 11, 12] : [selectedGrade];
       const res = await teachingAssignmentApi.previewAutoAssign(
         selectedYearId,
         gradeList.join(","),
@@ -206,7 +209,7 @@ const TeachingAssignmentTab = () => {
 
     if (payload.length === 0)
       return message.warning("Chưa có dữ liệu nào để lưu!");
-    
+
     const finalPayload = {
       academicYearId: selectedYearId,
       assignments: payload,
@@ -275,7 +278,7 @@ const TeachingAssignmentTab = () => {
             value={cellData?.teacherId || null}
             options={teacherOptions}
             allowClear
-            disabled={isYearLocked} 
+            disabled={isYearLocked}
             labelRender={({ label, value }) => {
               const optionData = teacherOptions.find(
                 (opt) => opt.value === value,
@@ -357,7 +360,7 @@ const TeachingAssignmentTab = () => {
             options={GRADE_OPTIONS}
           />
         </Space>
-        
+
         {!isYearLocked && (
           <Space wrap>
             {isMatrixEmpty && (

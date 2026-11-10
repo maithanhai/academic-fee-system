@@ -22,6 +22,7 @@ import com.mth.academicfeesystem.modules.academic.repository.SchoolClassReposito
 import com.mth.academicfeesystem.modules.academic.repository.SemesterRepository;
 import com.mth.academicfeesystem.modules.academic.repository.SubjectRepository;
 import com.mth.academicfeesystem.modules.audit.annotation.Auditable;
+import com.mth.academicfeesystem.modules.audit.aspect.AuditContext;
 import com.mth.academicfeesystem.modules.grade.dto.request.GradeSaveRequest;
 import com.mth.academicfeesystem.modules.grade.dto.response.GradeTableResponse;
 import com.mth.academicfeesystem.modules.grade.dto.response.GradeTableResponse.GradeColumnConfig;
@@ -187,6 +188,7 @@ public class GradeServiceImpl implements GradeService {
                                                                                                 .gradeId(g.getId())
                                                                                                 .score(g.getScoreValue())
                                                                                                 .ordinalNumber(g.getOrdinalNumber())
+                                                                                                .examType(g.getExamType().name())
                                                                                                 .build(),
                                                                                 Collectors.toList()))));
                 List<StudentGradeRow> rows = students.stream()
@@ -233,11 +235,18 @@ public class GradeServiceImpl implements GradeService {
                 Grade grade;
                 if (existingGrade.isPresent()) {
                         grade = existingGrade.get();
+                        AuditContext.setBefore(GradeDetailResponse.builder()
+                                        .gradeId(grade.getId())
+                                        .score(grade.getScoreValue())
+                                        .ordinalNumber(grade.getOrdinalNumber())
+                                        .examType(grade.getExamType().name())
+                                        .build());
                         if (grade.getScoreValue() == request.score()) {
                                 return GradeDetailResponse.builder()
                                                 .gradeId(grade.getId())
                                                 .score(grade.getScoreValue())
                                                 .ordinalNumber(grade.getOrdinalNumber())
+                                                .examType(grade.getExamType().name())
                                                 .build();
                         }
                         grade.setScoreValue(request.score());
@@ -259,6 +268,7 @@ public class GradeServiceImpl implements GradeService {
                                 .gradeId(savedGrade.getId())
                                 .score(savedGrade.getScoreValue())
                                 .ordinalNumber(savedGrade.getOrdinalNumber())
+                                .examType(savedGrade.getExamType().name())
                                 .build();
         }
 

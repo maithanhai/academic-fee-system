@@ -57,10 +57,10 @@ const TeacherLayout = () => {
           <div
             style={{ fontWeight: "bold", fontSize: "14px", color: "#1f1f1f" }}
           >
-            {fullname || "Giáo viên"}
+            {fullname || "Học sinh"}
           </div>
           <div style={{ color: "#8c8c8c", fontSize: "12px", marginTop: "2px" }}>
-            @{username || "teacher"}
+            @{username || "student"}
           </div>
         </div>
       ),
@@ -96,8 +96,8 @@ const TeacherLayout = () => {
       dispatch(logout());
       message.success("Đăng xuất thành công!");
       navigate("/login");
-    } catch {
-      message.error("Lỗi khi đăng xuất!");
+    } catch (error) {
+      message.error(error.response?.data?.message || "Lỗi khi đăng xuất!");
     }
   };
 

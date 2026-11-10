@@ -18,8 +18,8 @@ const SubjectTab = () => {
     try {
       const res = await subjectApi.getSubjects();
       setData(res.data?.data || []);
-    } catch {
-      message.error('Lỗi khi tải danh sách môn học!');
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Lỗi khi tải danh sách môn học!');
     } finally {
       setLoading(false);
     }

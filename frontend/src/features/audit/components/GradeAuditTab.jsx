@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { DatePicker, Input, Select, Table, Space, Typography, message, Button } from 'antd';
 import { EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import auditLogApi from '../api/auditLogApi';
+import { toDisplayDateTime } from '../../../shared/utils/dateUtils';
 
 const { Text } = Typography;
 const { RangePicker } = DatePicker;
@@ -27,8 +28,8 @@ const GradeAuditTab = ({ onOpenDetail }) => {
       const { data, totalElements } = response.data.data;
       setLogs(data);
       setPagination({ current: page, pageSize, total: totalElements });
-    } catch {
-      message.error('Lỗi khi tải lịch sử điểm số!');
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Lỗi khi tải lịch sử điểm số!');
     } finally {
       setLoading(false);
     }
@@ -42,7 +43,7 @@ const GradeAuditTab = ({ onOpenDetail }) => {
 
   const columns = [
     { title: 'ID', dataIndex: 'id', width: 70 },
-    { title: 'THỜI GIAN', dataIndex: 'createdDate', render: (date) => <Text>{new Date(date).toLocaleString('vi-VN')}</Text> },
+    { title: 'THỜI GIAN', dataIndex: 'createdDate', render: (date) => <Text>{toDisplayDateTime(date)}</Text> },
     { title: 'NGƯỜI THỰC HIỆN', dataIndex: 'actorFullName', render: (name) => <Text strong>{name}</Text> },
     { title: 'HÀNH ĐỘNG', dataIndex: 'action' },
     { title: 'IP', dataIndex: 'ipAddress', width: 150 },

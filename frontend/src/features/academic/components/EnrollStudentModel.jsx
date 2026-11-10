@@ -1,9 +1,15 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Modal, Form, Select, message } from 'antd';
-import studentApi from '../../people/api/studentApi';
-import classEnrollmentApi from '../api/classEnrollmentApi';
+import { useState, useEffect, useCallback } from "react";
+import { Modal, Form, Select, message } from "antd";
+import studentApi from "../../people/api/studentApi";
+import classEnrollmentApi from "../api/classEnrollmentApi";
 
-const EnrollStudentModal = ({ open, onClose, classId, academicYearId, onSuccess }) => {
+const EnrollStudentModal = ({
+  open,
+  onClose,
+  classId,
+  academicYearId,
+  onSuccess,
+}) => {
   const [form] = Form.useForm();
   const [studentsList, setStudentsList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -14,8 +20,8 @@ const EnrollStudentModal = ({ open, onClose, classId, academicYearId, onSuccess 
       setLoading(true);
       const res = await studentApi.getUnenrolledStudents(academicYearId);
       setStudentsList(res.data.data || []);
-    } catch  {
-      message.error("Lỗi khi tải danh sách học sinh chưa có lớp");
+    } catch (error) {
+      message.error(error.response?.data?.message || "Lỗi khi tải danh sách học sinh chưa có lớp");
     } finally {
       setLoading(false);
     }
@@ -23,7 +29,7 @@ const EnrollStudentModal = ({ open, onClose, classId, academicYearId, onSuccess 
 
   useEffect(() => {
     if (open) {
-      Promise.resolve().then(() =>fetchUnenrolled());
+      Promise.resolve().then(() => fetchUnenrolled());
     }
   }, [open, fetchUnenrolled]);
 
@@ -37,8 +43,10 @@ const EnrollStudentModal = ({ open, onClose, classId, academicYearId, onSuccess 
       form.resetFields();
       onSuccess();
       onClose();
-    } catch {
-      message.error("Lỗi khi xếp lớp");
+    } catch (error) {
+      message.error(
+        error.response?.data?.message || "Không thể ghi danh học sinh",
+      );
     }
   };
 
@@ -46,19 +54,26 @@ const EnrollStudentModal = ({ open, onClose, classId, academicYearId, onSuccess 
     <Modal
       title="Thêm học sinh vào lớp"
       open={open}
-      onCancel={() => { form.resetFields(); onClose(); }}
+      onCancel={() => {
+        form.resetFields();
+        onClose();
+      }}
       onOk={() => form.submit()}
       destroyOnHidden
     >
       <Form form={form} layout="vertical" onFinish={handleFinish}>
-        <Form.Item name="studentIds" label="Chọn học sinh" rules={[{ required: true, message: 'Chọn ít nhất 1!' }]}>
-          <Select 
-            mode="multiple" 
+        <Form.Item
+          name="studentIds"
+          label="Chọn học sinh"
+          rules={[{ required: true, message: "Chọn ít nhất 1!" }]}
+        >
+          <Select
+            mode="multiple"
             placeholder="Tìm học sinh chưa phân lớp..."
             loading={loading}
-            options={studentsList.map(s => ({
+            options={studentsList.map((s) => ({
               value: s.id,
-              label: `${s.fullName} (${s.username})`
+              label: `${s.fullName} (${s.username})`,
             }))}
           />
         </Form.Item>

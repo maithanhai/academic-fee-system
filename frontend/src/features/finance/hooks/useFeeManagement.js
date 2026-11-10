@@ -31,8 +31,8 @@ export const useFeeManagement = () => {
       try {
         const response = await academicYearApi.getAcademicYears();
         setAcademicYears(response.data?.data || []);
-      } catch {
-        message.error("Lỗi khi tải danh sách năm học");
+      } catch (error) {
+        message.error(error.response?.data?.message || "Lỗi khi tải danh sách năm học");
       }
     };
     fetchAcademicYears();

@@ -295,7 +295,7 @@ const StudentFinancePage = () => {
                   <>
                     <Text><strong>Phương thức:</strong> {invoiceDetail.paymentMethod==="BANK_TRANSFER" ? "Chuyển khoản" : "Tiền mặt"}</Text>
                     <Text><strong>Ngày thanh toán:</strong> {toDisplayDate(invoiceDetail.updatedDate)}</Text>
-                    <Text><strong>Người xác nhận:</strong> {invoiceDetail.actionByName || "Hệ thống tự động"}</Text>
+                    <Text><strong>Người xác nhận:</strong> {invoiceDetail.actionByName || "Hệ thống"}</Text>
                   </>
                 )}
 

@@ -25,8 +25,8 @@ const AcademicYearTab = () => {
     try {
       const res = await academicYearApi.getAcademicYears();
       setData(res.data?.data || []);
-    } catch {
-      message.error("Lỗi khi tải danh sách năm học!");
+    } catch (error) {
+      message.error(error.response?.data?.message || "Lỗi khi tải danh sách năm học!");
     } finally {
       setLoading(false);
     }

@@ -1,0 +1,49 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: academic-fee-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-123456}
+      MYSQL_DATABASE: academic_fee_system
+    ports:
+      - "3307:3306"
+    volumes:
+      - academic-fee-mysql-data:/var/lib/mysql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping --protocol=TCP --host=127.0.0.1 --user=root --password=\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+  maildev:
+    image: maildev/maildev:2.2.1
+    container_name: academic-fee-maildev
+    ports:
+      - "1080:1080"
+    restart: unless-stopped
+  backend:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: ${DB_URL:-jdbc:mysql://mysql:3306/academic_fee_system}
+      DB_USERNAME: ${DB_USERNAME:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-123456}
+      SPRING_MAIL_HOST: maildev
+      SPRING_MAIL_PORT: 1025
+    depends_on:
+      mysql:
+        condition: service_healthy
+      maildev:
+        condition: service_started
+    restart: unless-stopped
+  frontend:
+    build: ./frontend
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+volumes:
+  academic-fee-mysql-data:

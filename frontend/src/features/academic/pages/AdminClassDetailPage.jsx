@@ -29,8 +29,8 @@ const AdminClassDetailPage = () => {
       setLoading(true);
       const res = await classApi.getStudentsByClassId(classId);
       setStudents(res.data?.data || []);
-    } catch {
-      message.error("Lỗi khi tải danh sách học sinh");
+    } catch (error) {
+      message.error(error.response?.data?.message || "Lỗi khi tải danh sách học sinh");
     } finally {
       setLoading(false);
     }

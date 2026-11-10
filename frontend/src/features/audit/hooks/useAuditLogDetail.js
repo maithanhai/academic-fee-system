@@ -17,8 +17,8 @@ const useAuditLogDetail = () => {
           ? await auditLogApi.getGradeAuditLogById(id)
           : await auditLogApi.getInvoiceAuditLogById(id);
       setDetail(response.data.data);
-    } catch {
-      message.error("Không tải được chi tiết lịch sử!");
+    } catch (error) {
+      message.error(error.response?.data?.message || "Không tải được chi tiết lịch sử!");
       setOpen(false);
     } finally {
       setLoading(false);
